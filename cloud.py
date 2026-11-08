@@ -124,58 +124,91 @@ def render(top, merged, runs, day_rows, start, top_n):
         for p in t["platforms"]:
             platforms.add(p)
             plat_count[p] += t["count"]
+    issue = "%s 年第 %d 期" % (end.strftime("%Y"), int(end.strftime("%W")))
 
     parts = [
         '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width,initial-scale=1">',
-        '<title>一周社会热点周报</title>', h.STYLE,
+        '<title>社会热点周报 · %s</title>' % h.esc(issue), h.STYLE,
         '</head><body><div class="wrap">',
-        '<h1>一周社会热点周报</h1>',
-        '<div class="sub">统计周期：%s ｜ 云端生成 ｜ 数据来自公开热榜</div>' % h.esc(period),
-        '<div class="cards">',
+        '<header class="masthead">',
+        '<div><p class="kicker">WEEKLY PUBLIC ATTENTION DIGEST</p>',
+        '<h1>社会热点周报</h1></div>',
+        '<div class="issue"><b>%s</b>统计周期 %s<br>每周日更新 · 云端生成</div>' %
+        (h.esc(issue), h.esc(period)),
+        '</header>',
+        '<div class="dateline">',
+        '<span>数据源 <b>%d 个公开热榜平台</b></span>' % len(platforms),
+        '<span>生成于 <b>%s</b></span>' % h.esc(end.strftime("%Y-%m-%d %H:%M")),
+        '<span>本期收录 <b>%d</b> 个话题</span>' % len(merged),
+        '</div>',
+        '<div class="stats">',
     ]
     for label, val in (("采集批次", runs), ("原始条目", raw),
                        ("去重话题", len(merged)), ("覆盖平台", len(platforms))):
-        parts.append('<div class="card"><b>%s</b><span>%s</span></div>' % (val, label))
+        parts.append('<div class="stat"><b>%s</b><span>%s</span></div>' % (val, label))
     parts.append('</div>')
 
-    parts.append('<h2>热度 Top %d</h2>' % min(top_n, len(top)))
+    if top:
+        parts.append('<h2>本期焦点<span class="en">Editor\'s pick</span></h2>')
+        parts.append('<p class="lede">按出现次数、跨平台覆盖与最佳排名综合排序，取前三条。</p>')
+        parts.append('<div class="focus">')
+        for i, (title, t) in enumerate(top[:3], 1):
+            parts.append('<article><div class="no">焦点 %02d</div>' % i)
+            parts.append('<h3>%s</h3>' % h.make_link(title, t["url"]))
+            parts.append('<div class="meta">出现 %d 次 · %d 个平台 · 最佳第 %d 名</div>' %
+                         (t["count"], len(t["platforms"]), t["best"]))
+            parts.append('</article>')
+        parts.append('</div>')
+
+    parts.append('<h2>热度榜单<span class="en">Ranking</span></h2>')
+    rest = top[3:]
     if not top:
-        parts.append('<div class="empty">暂无数据。数据采集 workflow 运行几次后这里就会有内容。</div>')
+        parts.append('<div class="empty">暂无数据。采集 workflow 运行几次后这里就会有内容。</div>')
+    elif not rest:
+        parts.append('<div class="empty">本期话题较少，已全部列于上方焦点区。</div>')
     else:
-        parts.append('<table><thead><tr><th>#</th><th>话题</th><th>出现次数</th>'
-                     '<th>上榜平台</th><th>最佳排名</th><th class="hide">首次出现</th>'
+        parts.append('<p class="lede">点击标题跳转原榜单；「出现」为被采集到的次数。</p>')
+        parts.append('<table><thead><tr><th>序</th><th>话题</th><th>出现</th>'
+                     '<th>上榜平台</th><th>最佳</th><th class="hide">首次出现</th>'
                      '</tr></thead><tbody>')
-        for i, (title, t) in enumerate(top, 1):
+        for i, (title, t) in enumerate(rest, 4):
             tags = "".join('<span class="tag">%s</span>' % h.esc(p)
                            for p in sorted(t["platforms"]))
             parts.append(
-                "<tr><td class='num'>%d</td><td>%s</td><td class='num'>%d</td>"
-                "<td>%s</td><td class='num'>%d</td><td class='num hide'>%s</td></tr>" %
+                "<tr><td class='rank'>%d</td><td class='topic'>%s</td>"
+                "<td class='num'>%d</td><td>%s</td><td class='num'>%d</td>"
+                "<td class='num hide'>%s</td></tr>" %
                 (i, h.make_link(title, t["url"]), t["count"], tags, t["best"],
                  h.esc(t["first"][:16].replace("T", " "))))
         parts.append('</tbody></table>')
 
+    if plat_count:
+        parts.append('<h2>平台覆盖<span class="en">Sources</span></h2>')
+        parts.append('<p class="lede">各平台累计被采集到的条目占比。</p>')
+        total = sum(plat_count.values())
+        parts.append('<div class="bars">')
+        for name, cnt in plat_count.most_common():
+            pct = 100.0 * cnt / total
+            parts.append('<div class="bar"><span class="nm">%s</span>'
+                         '<span class="track"><span class="fill" style="width:%.1f%%"></span></span>'
+                         '<span class="v">%d · %.1f%%</span></div>' %
+                         (h.esc(name), pct, cnt, pct))
+        parts.append('</div>')
+
     if day_rows:
-        parts.append('<h2>每日采集概览</h2><table><thead><tr><th>日期</th>'
-                     '<th>采集次数</th><th>当日话题</th></tr></thead><tbody>')
+        parts.append('<h2>每日采集概览<span class="en">Log</span></h2>')
+        parts.append('<table><thead><tr><th>日期</th><th>采集次数</th>'
+                     '<th>当日话题</th></tr></thead><tbody>')
         for d, r, c in day_rows:
             parts.append("<tr><td>%s</td><td class='num'>%d</td>"
                          "<td class='num'>%d</td></tr>" % (h.esc(d), r, c))
         parts.append('</tbody></table>')
 
-    if plat_count:
-        parts.append('<h2>平台覆盖</h2><table><thead><tr><th>平台</th>'
-                     '<th>累计条目</th><th>占比</th></tr></thead><tbody>')
-        total = sum(plat_count.values())
-        for name, cnt in plat_count.most_common():
-            parts.append("<tr><td>%s</td><td class='num'>%d</td>"
-                         "<td class='num'>%.1f%%</td></tr>" %
-                         (h.esc(name), cnt, 100.0 * cnt / total))
-        parts.append('</tbody></table>')
-
-    parts.append('<div class="foot">由 GitHub Actions 定时生成 · 数据源 newsnow 公共热榜接口 · '
-                 '仅汇总公开新闻标题与链接，不含任何账号或密钥信息。</div>')
+    parts.append('<div class="foot"><span>社会热点周报 · 由 GitHub Actions 定时生成 · '
+                 '数据源 newsnow 公共热榜接口</span>'
+                 '<span>仅汇总公开标题与链接，不含任何账号或密钥 · %s</span></div>' %
+                 h.esc(end.strftime("%Y")))
     parts.append('</div></body></html>')
     return "".join(parts)
 
