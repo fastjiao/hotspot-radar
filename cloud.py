@@ -161,27 +161,40 @@ def render(top, merged, runs, day_rows, start, top_n):
             parts.append('</article>')
         parts.append('</div>')
 
-    parts.append('<h2>热度榜单<span class="en">Ranking</span></h2>')
+    parts.append('<section class="rank-section">')
+    parts.append('<h2 id="rank-head">热度榜单<span class="en">Ranking</span></h2>')
     rest = top[3:]
     if not top:
         parts.append('<div class="empty">暂无数据。采集 workflow 运行几次后这里就会有内容。</div>')
     elif not rest:
         parts.append('<div class="empty">本期话题较少，已全部列于上方焦点区。</div>')
     else:
-        parts.append('<p class="lede">点击标题跳转原榜单；「出现」为被采集到的次数。</p>')
-        parts.append('<table><thead><tr><th>序</th><th>话题</th><th>出现</th>'
-                     '<th>上榜平台</th><th>最佳</th><th class="hide">首次出现</th>'
+        parts.append('<p class="lede">点击标题跳转原榜单；点击任意列表头可排序，再点一次反转方向。'
+                     '向下滚动时标题与表头会吸附在页面顶部。</p>')
+        parts.append('<table class="sortable" id="ranking"><thead><tr>'
+                     '<th class="sortable" data-col="0" data-type="num" data-first="asc" title="按序号排序">序</th>'
+                     '<th class="sortable" data-col="1" data-type="text" data-first="asc" title="按话题名称排序">话题</th>'
+                     '<th class="sortable" data-col="2" data-type="num" data-first="desc" title="按出现次数排序">出现</th>'
+                     '<th class="sortable" data-col="3" data-type="num" data-first="desc" title="按上榜平台数排序">上榜平台</th>'
+                     '<th class="sortable" data-col="4" data-type="num" data-first="asc" title="按最佳排名排序">最佳</th>'
+                     '<th class="sortable hide" data-col="5" data-type="text" data-first="asc" title="按首次出现时间排序">首次出现</th>'
                      '</tr></thead><tbody>')
         for i, (title, t) in enumerate(rest, 4):
             tags = "".join('<span class="tag">%s</span>' % h.esc(p)
                            for p in sorted(t["platforms"]))
+            first = t["first"][:16].replace("T", " ")
             parts.append(
-                "<tr><td class='rank'>%d</td><td class='topic'>%s</td>"
-                "<td class='num'>%d</td><td>%s</td><td class='num'>%d</td>"
-                "<td class='num hide'>%s</td></tr>" %
-                (i, h.make_link(title, t["url"]), t["count"], tags, t["best"],
-                 h.esc(t["first"][:16].replace("T", " "))))
+                "<tr><td class='rank' data-v='%d'>%d</td>"
+                "<td class='topic' data-v='%s'>%s</td>"
+                "<td class='num' data-v='%d'>%d</td>"
+                "<td data-v='%d'>%s</td>"
+                "<td class='num' data-v='%d'>%d</td>"
+                "<td class='num hide' data-v='%s'>%s</td></tr>" %
+                (i, i, h.esc(title), h.make_link(title, t["url"]),
+                 t["count"], t["count"], len(t["platforms"]), tags,
+                 t["best"], t["best"], h.esc(first), h.esc(first)))
         parts.append('</tbody></table>')
+    parts.append('</section>')
 
     if plat_count:
         parts.append('<h2>平台覆盖<span class="en">Sources</span></h2>')
@@ -198,18 +211,65 @@ def render(top, merged, runs, day_rows, start, top_n):
 
     if day_rows:
         parts.append('<h2>每日采集概览<span class="en">Log</span></h2>')
-        parts.append('<table><thead><tr><th>日期</th><th>采集次数</th>'
-                     '<th>当日话题</th></tr></thead><tbody>')
+        parts.append('<table class="sortable"><thead><tr>'
+                     '<th class="sortable" data-col="0" data-type="text" data-first="desc" title="按日期排序">日期</th>'
+                     '<th class="sortable" data-col="1" data-type="num" data-first="desc" title="按采集次数排序">采集次数</th>'
+                     '<th class="sortable" data-col="2" data-type="num" data-first="desc" title="按当日话题数排序">当日话题</th>'
+                     '</tr></thead><tbody>')
         for d, r, c in day_rows:
-            parts.append("<tr><td>%s</td><td class='num'>%d</td>"
-                         "<td class='num'>%d</td></tr>" % (h.esc(d), r, c))
+            parts.append("<tr><td data-v='%s'>%s</td><td class='num' data-v='%d'>%d</td>"
+                         "<td class='num' data-v='%d'>%d</td></tr>" %
+                         (h.esc(d), h.esc(d), r, r, c, c))
         parts.append('</tbody></table>')
 
     parts.append('<div class="foot"><span>社会热点周报 · 由 GitHub Actions 定时生成 · '
                  '数据源 newsnow 公共热榜接口</span>'
                  '<span>仅汇总公开标题与链接，不含任何账号或密钥 · %s</span></div>' %
                  h.esc(end.strftime("%Y")))
-    parts.append('</div></body></html>')
+    parts.append('</div>')
+    parts.append("""<script>
+(function(){
+  var head=document.getElementById('rank-head');
+  if(head){document.documentElement.style.setProperty('--head-h',head.offsetHeight+'px');}
+  document.querySelectorAll('table.sortable').forEach(function(table){
+    var tbody=table.tBodies[0];
+    var ths=Array.prototype.slice.call(table.querySelectorAll('thead th.sortable'));
+    ths.forEach(function(th){
+      th.setAttribute('tabindex','0');
+      th.setAttribute('role','button');
+      function sortIt(){
+        var col=parseInt(th.getAttribute('data-col'),10);
+        var type=th.getAttribute('data-type');
+        var dir=th.getAttribute('data-dir');
+        dir=dir?(dir==='asc'?'desc':'asc'):(th.getAttribute('data-first')||'asc');
+        ths.forEach(function(o){o.removeAttribute('data-dir');o.removeAttribute('aria-sort');});
+        th.setAttribute('data-dir',dir);
+        th.setAttribute('aria-sort',dir==='asc'?'ascending':'descending');
+        var rows=Array.prototype.slice.call(tbody.rows);
+        rows.sort(function(a,b){
+          var av=String(a.cells[col].getAttribute('data-v')||a.cells[col].textContent).trim();
+          var bv=String(b.cells[col].getAttribute('data-v')||b.cells[col].textContent).trim();
+          var r=0;
+          if(type==='num'){r=(parseFloat(av)||0)-(parseFloat(bv)||0);}
+          else{r=av.localeCompare(bv,'zh-CN');}
+          if(r===0){
+            var ai=parseInt(a.cells[0].getAttribute('data-v'),10)||0;
+            var bi=parseInt(b.cells[0].getAttribute('data-v'),10)||0;
+            return ai-bi;
+          }
+          return dir==='asc'?r:-r;
+        });
+        rows.forEach(function(row){tbody.appendChild(row);});
+      }
+      th.addEventListener('click',sortIt);
+      th.addEventListener('keydown',function(e){
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();sortIt();}
+      });
+    });
+  });
+})();
+</script>""")
+    parts.append('</body></html>')
     return "".join(parts)
 
 

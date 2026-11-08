@@ -162,11 +162,20 @@ h2 .en{float:right;font:400 10px/2.8 -apple-system,BlinkMacSystemFont,"Segoe UI"
 .focus h3 a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent}
 .focus h3 a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .focus .meta{font-size:11px;letter-spacing:.05em;color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:13px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
 th{padding:10px;text-align:left;white-space:nowrap;font-weight:400;font-size:10px;
  letter-spacing:.18em;color:var(--muted);border-bottom:1px solid var(--ink)}
 td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 tbody tr:hover td{background:var(--hover)}
+.rank-section{position:relative}
+.rank-section h2{position:sticky;top:0;z-index:6;background:var(--paper)}
+.rank-section thead th{position:sticky;top:var(--head-h,42px);z-index:5;background:var(--paper)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--accent)}
+th.sortable:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+th.sortable::after{content:"";display:inline-block;width:9px;margin-left:3px;font-size:9px}
+th.sortable[data-dir="asc"]::after{content:"▲";color:var(--accent)}
+th.sortable[data-dir="desc"]::after{content:"▼";color:var(--accent)}
 td.rank{width:46px;font-family:Georgia,serif;font-size:18px;color:var(--accent)}
 td.topic{line-height:1.5}
 td.topic a{color:var(--ink);text-decoration:none}
