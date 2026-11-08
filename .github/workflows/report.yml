@@ -1,0 +1,43 @@
+name: Hotspot weekly report
+
+# UTC 周日 12:43 = 北京时间周日 20:43
+on:
+  schedule:
+    - cron: '43 12 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hotspot-data
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build weekly report
+        run: python cloud.py report
+
+      - name: Commit report
+        run: |
+          git config user.name "hotspot-bot"
+          git config user.email "hotspot-bot@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "No report changes"
+          else
+            git commit -m "report: week $(date -u +%Y-%m-%d)"
+            git pull --rebase origin "${{ github.ref_name }}" || true
+            git push
+          fi

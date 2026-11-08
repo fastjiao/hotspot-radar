@@ -1,0 +1,20 @@
+{
+  "collect_times": ["09:00", "13:00", "20:00"],
+  "report_time": "20:30",
+  "top_n": 60,
+  "retention_days": 120,
+  "request_interval": 0.6,
+  "platforms": [
+    {"id": "toutiao", "name": "今日头条", "domain": "toutiao.com", "enabled": true},
+    {"id": "baidu", "name": "百度热搜", "domain": "baidu.com", "enabled": true},
+    {"id": "wallstreetcn-hot", "name": "华尔街见闻", "domain": "wallstreetcn.com", "enabled": true},
+    {"id": "thepaper", "name": "澎湃新闻", "domain": "thepaper.cn", "enabled": true},
+    {"id": "bilibili-hot-search", "name": "B站热搜", "domain": "bilibili.com", "enabled": true},
+    {"id": "cls-hot", "name": "财联社", "domain": "cls.cn", "enabled": true},
+    {"id": "ifeng", "name": "凤凰网", "domain": "ifeng.com", "enabled": true},
+    {"id": "tieba", "name": "贴吧", "domain": "baidu.com", "enabled": true},
+    {"id": "weibo", "name": "微博", "domain": "weibo.com", "enabled": true},
+    {"id": "douyin", "name": "抖音", "domain": "douyin.com", "enabled": true},
+    {"id": "zhihu", "name": "知乎", "domain": "zhihu.com", "enabled": true}
+  ]
+}
