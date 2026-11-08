@@ -1,9 +1,10 @@
 name: Hotspot weekly report
 
-# UTC 周日 12:43 = 北京时间周日 20:43
+# UTC 周五 12:43 = 北京时间周五 20:43
+# cron 星期位：0/7=周日，5=周五
 on:
   schedule:
-    - cron: '43 12 * * 0'
+    - cron: '43 12 * * 5'
   workflow_dispatch:
 
 permissions:

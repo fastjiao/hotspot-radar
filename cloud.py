@@ -134,7 +134,7 @@ def render(top, merged, runs, day_rows, start, top_n):
         '<header class="masthead">',
         '<div><p class="kicker">WEEKLY PUBLIC ATTENTION DIGEST</p>',
         '<h1>社会热点周报</h1></div>',
-        '<div class="issue"><b>%s</b>统计周期 %s<br>每周日更新 · 云端生成</div>' %
+        '<div class="issue"><b>%s</b>统计周期 %s<br>每周五更新 · 云端生成</div>' %
         (h.esc(issue), h.esc(period)),
         '</header>',
         '<div class="dateline">',
