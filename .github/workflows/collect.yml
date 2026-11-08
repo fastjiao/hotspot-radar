@@ -32,14 +32,17 @@ jobs:
         run: python cloud.py collect
 
       - name: Commit data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "hotspot-bot"
           git config user.email "hotspot-bot@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git add data/
           if git diff --cached --quiet; then
             echo "No data changes"
-          else
-            git commit -m "data: collect $(date -u +%Y-%m-%dT%H:%MZ)"
-            git pull --rebase origin "${{ github.ref_name }}" || true
-            git push
+            exit 0
           fi
+          git commit -m "data: collect $(date -u +%Y-%m-%dT%H:%MZ)"
+          # checkout 默认是 detached HEAD，必须显式给 refspec，否则 push 会立即失败
+          git push origin HEAD:"${{ github.ref_name }}"
