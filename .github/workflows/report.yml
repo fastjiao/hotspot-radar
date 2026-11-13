@@ -1,6 +1,7 @@
 name: Hotspot daily report
 
 # UTC 每天 12:43 = 北京时间每天 20:43
+# 采集末批在北京 20:17（见 collect.yml），日报 20:43 能收全当天 7 轮数据。
 # 与 Weekly digest（周五 20:47）共用同一 concurrency 组串行执行。
 # 避开整点：GitHub Actions 整点排队最容易延迟甚至丢弃。
 on:
