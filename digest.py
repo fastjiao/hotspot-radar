@@ -90,7 +90,10 @@ a{color:#2b4d73;text-decoration:none}a:hover{text-decoration:underline}
 .empty{color:var(--muted);font-size:13px;padding:6px 0}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;
 border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:normal}
-.ai{background:#fff;border:1px solid var(--line);padding:16px 20px;white-space:pre-wrap;font-size:14px}
+.ai{background:#fff;border:1px solid var(--line);padding:16px 20px;white-space:pre-wrap;font-size:14px;line-height:1.75}
+.ai strong{color:var(--ink);font-weight:600}
+.ai .ai-h{display:block;margin:14px 0 6px;font-weight:600;color:var(--ink)}
+.ai code{background:#f3f0e9;padding:1px 5px;border-radius:3px;font-size:13px}
 footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:12px;color:var(--muted);font-size:12px}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:22px 15px 50px}}
 """
@@ -98,6 +101,25 @@ footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:12px;color:va
 
 def now():
     return datetime.now(BJ)
+
+
+def md_lite(text):
+    """把模型返回的 Markdown 做最小化渲染：只认加粗与小标题。
+
+    模型输出不可信，所以先整体 HTML 转义，再做白名单替换，
+    不会引入任何脚本或原始标签。换行交给 .ai 的 white-space:pre-wrap。
+    """
+    out = esc(text)
+    # 行首 ### / ## / # 视为小标题
+    out = re.sub(r"(?m)^#{1,6}\s*(.+)$", r'<span class="ai-h">\1</span>', out)
+    # **加粗**（跨行不匹配，避免误吞）
+    out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
+    # __加粗__ 与 `代码`
+    out = re.sub(r"__(.+?)__", r"<strong>\1</strong>", out)
+    out = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", out)
+    # 行首的 "- " / "* " 项目符号换成 ·
+    out = re.sub(r"(?m)^\s*[-*]\s+", "· ", out)
+    return out
 
 
 def get(url, timeout=12, retry=1):
@@ -421,7 +443,7 @@ def render_html(ctx):
 
     p.append('<h2>五、AI 解读</h2>')
     if ctx["ai_text"]:
-        p.append('<div class="ai">%s</div>' % esc(ctx["ai_text"]))
+        p.append('<div class="ai">%s</div>' % md_lite(ctx["ai_text"]))
     else:
         p.append('<div class="empty">%s。<br>启用方式：仓库 Settings → Secrets and variables '
                  '→ Actions → New repository secret，添加 <code>LLM_API_KEY</code>'
