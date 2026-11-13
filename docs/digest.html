@@ -23,21 +23,39 @@ border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:normal}
 footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:12px;color:var(--muted);font-size:12px}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:22px 15px 50px}}
 </style><style data-wb-nav>
-.wb-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;
-flex-wrap:wrap;padding:9px 20px;background:#fffdf8;border-bottom:1px solid #ddd6c8;
-font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-position:relative;z-index:50}
-.wb-nav a.wb-nav-brand{font-weight:500;color:#1b1a17;text-decoration:none;
-letter-spacing:.08em;white-space:nowrap}
-.wb-nav .wb-nav-links{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
-.wb-nav a.wb-nav-link{color:#5b564d;text-decoration:none;padding:5px 11px;
-border:1px solid transparent;border-radius:4px;white-space:nowrap}
-.wb-nav a.wb-nav-link:hover{color:#b23a24;background:#f5efe3;text-decoration:none}
-.wb-nav a.wb-nav-link.is-active{color:#b23a24;border-color:#e0c9b8;background:#faf1e8}
-@media(max-width:600px){.wb-nav{padding:8px 12px}
-.wb-nav a.wb-nav-link{padding:4px 8px;font-size:12px}}
+.wb-nav{position:sticky;top:0;z-index:100;width:100vw;margin-left:calc(50% - 50vw);
+box-sizing:border-box;background:rgba(240,243,248,.78);
+backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+border-bottom:1px solid rgba(255,255,255,.7);
+box-shadow:0 8px 30px rgba(2,6,23,.10);
+font:13px/1.5 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.wb-nav::before{content:"";display:block;height:3px;
+background:linear-gradient(90deg,#6366F1 0%,#A855F7 45%,#b23a24 100%)}
+.wb-nav::after{content:"";position:absolute;left:0;right:0;top:100%;height:52px;
+background:linear-gradient(180deg,rgba(240,243,248,.85),rgba(250,248,243,0));
+pointer-events:none}
+.wb-nav-inner{max-width:1200px;margin:0 auto;padding:.6rem 1rem;
+display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.wb-nav a.wb-nav-brand{font-weight:700;font-size:1.05rem;color:#1b1a17;
+text-decoration:none;letter-spacing:-.02em;white-space:nowrap}
+.wb-nav-links{display:flex;gap:2px;flex-wrap:wrap;align-items:center;padding:4px;
+border:1px solid rgba(255,255,255,.75);border-radius:999px;
+background:rgba(255,255,255,.4);
+backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.wb-nav a.wb-nav-link{color:#4a4d58;text-decoration:none;padding:6px 16px;
+font-size:.88rem;border-radius:999px;white-space:nowrap;
+transition:color 200ms ease,background 200ms ease,transform 200ms ease}
+.wb-nav a.wb-nav-link:hover{color:#111;background:rgba(255,255,255,.9);text-decoration:none}
+.wb-nav a.wb-nav-link.is-active{color:#fff;background:#6366F1;font-weight:700;
+transform:scale(1.06);box-shadow:0 2px 12px rgba(99,102,241,.35)}
+body{overflow-x:clip}
+@keyframes wb-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+body > .wrap{animation:wb-enter .3s ease-out both}
+@media(prefers-reduced-motion:reduce){body > .wrap{animation:none}}
+@media(max-width:600px){.wb-nav-inner{padding:.5rem .7rem;flex-wrap:wrap}
+.wb-nav a.wb-nav-link{padding:5px 10px;font-size:.8rem}}
 </style>
-</head><body><nav class="wb-nav" aria-label="站点导航"><a class="wb-nav-brand" href="/">Lovejiao</a><div class="wb-nav-links"><a class="wb-nav-link" href="/">首页</a><a class="wb-nav-link" href="/hotspot-radar/">社会热点周报</a><a class="wb-nav-link is-active" href="/hotspot-radar/digest.html" aria-current="page">热点信息差</a></div></nav><div class="wrap">
+</head><body><nav class="wb-nav" aria-label="站点导航"><div class="wb-nav-inner"><a class="wb-nav-brand" href="/">Lovejiao</a><div class="wb-nav-links"><a class="wb-nav-link" href="/">首页</a><a class="wb-nav-link" href="/hotspot-radar/">社会热点周报</a><a class="wb-nav-link is-active" href="/hotspot-radar/digest.html" aria-current="page">热点信息差</a></div></div></nav><div class="wrap">
 <header><h1>热点信息差</h1><div class="dateline">第 202645 期 · 2026-11-06 — 2026-11-13 · 每周五更新</div></header>
 <div class="status"><strong>本期采集状态</strong>：政务/招生站点 4/6 可用；新闻联播 7/7 天取到；AI 解读：未配置 LLM_API_KEY。失败源只标注、不影响其余内容。</div>
 <h2>本周时间节点提醒</h2>
