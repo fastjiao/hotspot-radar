@@ -1,6 +1,6 @@
 # 热点信息差 · 2026-11-13
 
-> 周期 2026-11-06 — 2026-11-13 ｜ 采集状态：站点 4/6 可用 ｜ AI 解读：未配置 LLM_API_KEY
+> 周期 2026-11-06 — 2026-11-13 ｜ 采集状态：站点 3/6 可用 ｜ AI 解读：已启用（glm-4-flash）
 
 ## 本周时间节点提醒
 
@@ -15,7 +15,7 @@
 - [我省2026年中等职业学校学生学业水平考试顺利开考](https://mp.weixin.qq.com/s/nKPGWb04I0TTwW45RG-Z1A) ｜ 适用于：2026年6月毕业的中职生（26届，预计）
 - [江苏省第22届高等教育自学考试毕业生专场招聘会在宁顺利举行](https://mp.weixin.qq.com/s/NDedGhkvurYmACbeFMGpvw) ｜ 适用于：各届备考参考（以官方原文为准）
 - [关于做好2026年中等职业学校学生学业水平考试工作的通知](https://www.jseea.cn/webfile/index/index_zcwj/2026-08-31/7500094318229590016.html) ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [江苏2026年中职学生学业水平考试和2027年中职职教高考报名问答](https://www.jszs.com/n/479091.html) ｜ 适用于：2027年6月毕业的中职生（27届，预计）
+- [直通好高职 | 江苏经贸职业技术学院今年计划招生2180人，招生结构实现“一降三增长”](https://edu.jschina.com.cn/jy/202607/t20260725_s6a64552ae4b04c44976a6e07.shtml) ｜ 适用于：各届备考参考（以官方原文为准）
 
 ## 一、中职 · 职教高考信息
 
@@ -36,21 +36,11 @@
 
 ### [江苏招生考试·职教高考](https://www.jszs.com/zhijiaogaokao/)
 
-- [江苏2026年中职学生学业水平考试和2027年中职职教高考报名问答](https://www.jszs.com/n/479091.html) ｜ 日期未标注 ｜ 适用于：2027年6月毕业的中职生（27届，预计）
-- [太湖创意职院2026年中职职教高考专科二批征求平行志愿简章](https://www.jszs.com/n/477961.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [无锡职业技术大学2026年中职职教高考招生简章](https://www.jszs.com/n/477797.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [太湖创意职业技术学院2026年中职职教高考招生专业及计划](https://www.jszs.com/n/477787.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [计划充足，欢迎报考！硅湖职业技术学院2026年中职职教高考！](https://www.jszs.com/n/477898.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [2026年中职职教高考本科和专科第一批次志愿填报今日下午5点结束](https://www.jszs.com/n/477791.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [中职职教高考](https://www.jszs.com/tag/17012.html) ｜ 日期未标注 ｜ 适用于：各届备考参考（以官方原文为准）
-- [中职职教高考|欢迎报考硅湖职业技术学院](https://www.jszs.com/n/477803.html) ｜ 日期未标注 ｜ 适用于：各届备考参考（以官方原文为准）
-- [职教高考| 2026年苏州百年职业学院中职职教高考填报指南](https://www.jszs.com/n/477795.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [江苏省2026年中职职教高考工作问答](https://www.jszs.com/n/475763.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [江苏省2026年中职职教高考工作问答（下篇）](https://www.jszs.com/n/475791.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
-- [江苏省2026年中职职教高考实施办法](https://www.jszs.com/n/475715.html) ｜ 日期未标注 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
+未取到：HTTPError: HTTP Error 404: Not Found
 
 ### [中国江苏网教育频道](https://edu.jschina.com.cn/)
 
+- [“弘扬教育家精神，讲述五年制高职育人故事”现场分享暨江苏联合职业技术学院名师共享工程启动](https://edu.jschina.com.cn/jy/202611/t20261113_s6af6ec25e4b05bfe6eb68a73.shtml) ｜ 2026-01-01 ｜ 适用于：各届备考参考（以官方原文为准）
 - [直通好高职 | 江苏经贸职业技术学院今年计划招生2180人，招生结构实现“一降三增长”](https://edu.jschina.com.cn/jy/202607/t20260725_s6a64552ae4b04c44976a6e07.shtml) ｜ 2026-00-07 ｜ 适用于：各届备考参考（以官方原文为准）
 - [直通好高职 | 江苏卫生健康职业学院：2026年江苏省内招生2037人，新增两个专业](https://edu.jschina.com.cn/jy/202607/t20260725_s6a6479f2e4b00787456ffab0.shtml) ｜ 2026-00-07 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
 - [产教相融 智育英才!高职院校高质量发展校长论坛在锡举办](https://edu.jschina.com.cn/scrollnews/202611/t20261112_s6af56482e4b0649c39c708f9.shtml) ｜ 2026-01-01 ｜ 适用于：各届备考参考（以官方原文为准）
@@ -62,7 +52,6 @@
 - [直通好高职|江苏海事职业技术学院：海洋船舶行业人才需求旺 已开设多个“订单班”](https://edu.jschina.com.cn/jy/202607/t20260725_s6a6446f6e4b03d9ce7971837.shtml) ｜ 2026-00-07 ｜ 适用于：各届备考参考（以官方原文为准）
 - [轨道类高职高专院校思政课骨干教师集中充电，这场量身定制培训亮点十足](https://edu.jschina.com.cn/jy/202607/t20260720_s6a5d81d3e4b03d9ce7970ec6.shtml) ｜ 2026-00-07 ｜ 适用于：各届备考参考（以官方原文为准）
 - [传承科学家精神 勇担交通强国使命 南京交通职业技术学院高中职思政课一体化建设联盟走进茅以升纪念馆开展主题研修活动](https://edu.jschina.com.cn/jy/202606/t20260629_s6a42169be4b0b6e57b5a5210.shtml) ｜ 2026-00-06 ｜ 适用于：各届备考参考（以官方原文为准）
-- [乘风破浪启新程 中华中专举行2026届毕业典礼](https://edu.jschina.com.cn/jy/202606/t20260626_s6a3e42d1e4b07fc6ee8bddaa.shtml) ｜ 2026-00-06 ｜ 适用于：2026年6月毕业的中职生（26届，预计）
 
 ### [江苏省沛县中等专业学校](http://www.pxzj.com/)
 
@@ -77,11 +66,11 @@
 
 ### [南京信息职业技术学院](https://www.njcit.cn/)
 
-未取到：timeout: The read operation timed out
+未取到：URLError: <urlopen error [Errno 101] Network is unreachable>
 
 ### [徐州市中考信息发布平台](https://www.jsxzeea.cn/)
 
-未取到：timeout: timed out
+未取到：TimeoutError: timed out
 
 ## 二、新闻联播（本周逐日）
 
@@ -196,16 +185,16 @@
 
 ## 三、GitHub 本周新建高星项目
 
-- [huamidev/GestaltX](https://github.com/huamidev/GestaltX) ｜ 7126 ★ ｜ An MobileGestalt editor for iOS 27.x, featuring region-code tweaks, device presets, backups.
-- [tangerineturtle1/NX2navi](https://github.com/tangerineturtle1/NX2navi) ｜ 3672 ★ ｜ 
-- [jhaizhou-ops/S2Arm](https://github.com/jhaizhou-ops/S2Arm) ｜ 2827 ★ ｜ Run your own Switch games natively on iPhone, iPad and Mac: game code rewritten to ARM64, graphics direct to M
-- [Kianuni/Erosion-CN](https://github.com/Kianuni/Erosion-CN) ｜ 1819 ★ ｜ iOS / iPadOS 系统配置与 MobileGestalt 研究工具箱（简体中文防白苹果安全加固版）
-- [HybridRobotics/supermimic](https://github.com/HybridRobotics/supermimic) ｜ 1389 ★ ｜ Humanoid whole-body motion tracking with one differentiable world model.
-- [agentes-chat/agentes-chat](https://github.com/agentes-chat/agentes-chat) ｜ 1257 ★ ｜ Open-source, self-hosted Slack alternative where your team and AI agents work together in channels and DMs. Ag
-- [apex-compute/ANR](https://github.com/apex-compute/ANR) ｜ 1173 ★ ｜ Apex Neural Rendering (ANR) by Apex Compute
-- [FrigadeHQ/yogurt](https://github.com/FrigadeHQ/yogurt) ｜ 1094 ★ ｜ Private AI meeting notes. Free and open source.
-- [Th0rgal/satmux](https://github.com/Th0rgal/satmux) ｜ 1064 ★ ｜ Accelerate high-latency GEO inflight Wi-Fi via warm BBR TCP multiplexing + 1-RTT Ground-TLS + zlib (zero depen
-- [HolyArrs/HolyArrs](https://github.com/HolyArrs/HolyArrs) ｜ 1035 ★ ｜ One self-hosted app for your shows, movies and music.
+- [huamidev/GestaltX](https://github.com/huamidev/GestaltX) ｜ 7182 ★ ｜ An MobileGestalt editor for iOS 27.x, featuring region-code tweaks, device presets, backups.
+- [tangerineturtle1/NX2navi](https://github.com/tangerineturtle1/NX2navi) ｜ 3718 ★ ｜ 
+- [jhaizhou-ops/S2Arm](https://github.com/jhaizhou-ops/S2Arm) ｜ 2838 ★ ｜ Run your own Switch games natively on iPhone, iPad and Mac: game code rewritten to ARM64, graphics direct to M
+- [Kianuni/Erosion-CN](https://github.com/Kianuni/Erosion-CN) ｜ 1854 ★ ｜ iOS / iPadOS 系统配置与 MobileGestalt 研究工具箱（简体中文防白苹果安全加固版）
+- [HybridRobotics/supermimic](https://github.com/HybridRobotics/supermimic) ｜ 1405 ★ ｜ Humanoid whole-body motion tracking with one differentiable world model.
+- [agentes-chat/agentes-chat](https://github.com/agentes-chat/agentes-chat) ｜ 1285 ★ ｜ Open-source, self-hosted Slack alternative where your team and AI agents work together in channels and DMs. Ag
+- [apex-compute/ANR](https://github.com/apex-compute/ANR) ｜ 1252 ★ ｜ Apex Neural Rendering (ANR) by Apex Compute
+- [FrigadeHQ/yogurt](https://github.com/FrigadeHQ/yogurt) ｜ 1158 ★ ｜ Private AI meeting notes. Free and open source.
+- [Th0rgal/satmux](https://github.com/Th0rgal/satmux) ｜ 1069 ★ ｜ Accelerate high-latency GEO inflight Wi-Fi via warm BBR TCP multiplexing + 1-RTT Ground-TLS + zlib (zero depen
+- [HolyArrs/HolyArrs](https://github.com/HolyArrs/HolyArrs) ｜ 1045 ★ ｜ One self-hosted app for your shows, movies and music.
 
 ## 四、社会热点
 
@@ -232,8 +221,42 @@
 
 ## 五、AI 解读
 
-未配置 LLM_API_KEY。配置 LLM_API_KEY 后自动生成。
+**本周中职职教高考与就业趋势分析周报**
+
+**一、本周重要时间节点及适用人群**
+
+1. **江苏省中等职业学校学生学业水平考试和中职职教高考报名办法发布**（适用于2028年6月毕业的中职生/28届）
+   - 日期：本周内
+   - 标题：《关于印发江苏省中等职业学校学生学业水平考试和中职职教高考报名办法的通知》
+
+2. **江苏省2026年中等职业学校学生学业水平考试考前提醒**（适用于2028年6月毕业的中职生/28届）
+   - 日期：本周内
+   - 标题：《江苏省2026年中等职业学校学生学业水平考试考前提醒》
+
+3. **江苏省2026年中等职业学校学生学业水平考试顺利开考**（适用于2028年6月毕业的中职生/28届）
+   - 日期：本周内
+   - 标题：《我省2026年中等职业学校学生学业水平考试顺利开考》
+
+**二、新闻联播行业趋势解读**
+
+1. **人工智能**：新闻联播中提到“新一代通信网加快建设 筑牢高质量发展数字底座”，这表明人工智能在通信领域的应用正在加速，预示着人工智能行业将持续发展。
+
+2. **计算机网络**：新闻联播提到“我国加快推进核能综合利用”，这涉及到计算机网络在核能领域的应用，显示出计算机网络技术在能源领域的应用前景广阔。
+
+3. **就业**：新闻联播中提到“全国冬小麦播种过八成”，这反映出农业现代化对技术人才的需求，预示着相关技术专业毕业生就业前景良好。
+
+**三、本周待办事项**
+
+对于28届中职生，本周待办事项为：
+- 关注江苏省中等职业学校学生学业水平考试和中职职教高考的报名信息，确保按时完成报名手续。
+
+**四、其他信息**
+
+- 江苏省各高职院校积极开展产教融合，如江苏经贸职业技术学院、江苏卫生健康职业学院等，这为中职生提供了更多高质量就业的机会。
+- 江苏省沛县中专等多所中职学校举办各类活动，如红色经典传唱、法制教育等，旨在提升学生的综合素质和就业竞争力。
 
 ---
+
+往期归档：archive.html
 
 适用对象为按年份自动推断，标注「预计」者请以官方原文为准。
