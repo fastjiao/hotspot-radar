@@ -28,6 +28,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
 
+import site_nav
+
 BASE = Path(__file__).resolve().parent
 DOCS = BASE / "docs"
 DATA = BASE / "data"
@@ -317,7 +319,8 @@ def render_html(ctx):
     p = []
     p.append('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">')
     p.append('<meta name="viewport" content="width=device-width,initial-scale=1">')
-    p.append('<title>热点信息差 · %s</title><style>%s</style></head><body><div class="wrap">' % (esc(ctx["date"]), CSS))
+    p.append('<title>热点信息差 · %s</title><style>%s</style>%s</head><body>%s<div class="wrap">'
+             % (esc(ctx["date"]), CSS, site_nav.head_css(), site_nav.nav_html("digest")))
     p.append('<header><h1>热点信息差</h1><div class="dateline">第 %s 期 · %s — %s · 每周五更新</div></header>'
              % (esc(ctx["issue"]), esc(ctx["start"]), esc(ctx["date"])))
 

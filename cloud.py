@@ -16,6 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import hotspot as h
+import site_nav
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
@@ -130,7 +131,8 @@ def render(top, merged, runs, day_rows, start, top_n):
         '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width,initial-scale=1">',
         '<title>社会热点周报 · %s</title>' % h.esc(issue), h.STYLE,
-        '</head><body><div class="wrap">',
+        site_nav.head_css(),
+        '</head><body>', site_nav.nav_html("radar"), '<div class="wrap">',
         '<header class="masthead">',
         '<div><p class="kicker">WEEKLY PUBLIC ATTENTION DIGEST</p>',
         '<h1>社会热点周报</h1></div>',
