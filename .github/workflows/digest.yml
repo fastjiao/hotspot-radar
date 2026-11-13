@@ -1,0 +1,53 @@
+name: Weekly digest
+
+# UTC 周五 12:47 = 北京时间周五 20:47
+# 比 Hotspot weekly report (12:43) 晚 4 分钟，同一 concurrency 组串行执行，
+# 避免两个 workflow 同时 commit docs/ 造成 non-fast-forward。
+# 避开整点：GitHub Actions 整点排队最容易延迟甚至丢弃。
+on:
+  schedule:
+    - cron: '47 12 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hotspot-data
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build weekly digest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+        run: python digest.py
+
+      - name: Commit digest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "hotspot-bot"
+          git config user.email "hotspot-bot@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git add docs/digest.html docs/digest.md
+          if git diff --cached --quiet; then
+            echo "No digest changes"
+            exit 0
+          fi
+          git commit -m "digest: week $(date -u +%Y-%m-%d)"
+          git push origin HEAD:"${{ github.ref_name }}"
