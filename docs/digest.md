@@ -1,6 +1,6 @@
-# 热点信息差 · 2026-11-13
+# 热点信息差 · 2026-11-14
 
-> 周期 2026-11-06 — 2026-11-13 ｜ 采集状态：站点 3/6 可用 ｜ AI 解读：已启用（glm-4-flash）
+> 周期 2026-11-07 — 2026-11-14 ｜ 采集状态：站点 3/6 可用 ｜ AI 解读：已启用（glm-4-flash）
 
 ## 本周时间节点提醒
 
@@ -73,25 +73,6 @@
 未取到：TimeoutError: timed out
 
 ## 二、新闻联播（本周逐日）
-
-### [2026-11-06](https://tv.cctv.com/lm/xwlb/day/20261106.shtml)
-
-- 习近平在参加北京市区人大代表换届选举投票时强调 践行全过程人民民主 确保选出人民满意的代表
-- 习近平举行仪式欢迎加蓬总统访华
-- 习近平同加蓬总统会谈
-- 习近平会见奥地利总理
-- 习近平签署国家主席令
-- 习近平复信澳大利亚青年学生
-- 李强主持召开国务院常务会议
-- 李强会见加蓬总统
-- 李强举行仪式欢迎奥地利总理访华
-- 李强同奥地利总理会谈
-- 十四届全国人大常委会第二十五次会议在京闭幕
-- 赵乐际分别会见加蓬总统、奥地利总理
-- 蔡奇会见朝鲜劳动党代表团
-- 【学习贯彻党的二十届五中全会精神】中央宣讲团在各地各部门宣讲党的二十届五中全会精神
-- 治理黄河80年取得举世瞩目伟大成就
-- 联播快讯
 
 ### [2026-11-07](https://tv.cctv.com/lm/xwlb/day/20261107.shtml)
 
@@ -183,18 +164,34 @@
 - 纪念孙中山先生诞辰160周年晋谒衣冠冢仪式在京举行
 - 联播快讯
 
+### [2026-11-13](https://tv.cctv.com/lm/xwlb/day/20261113.shtml)
+
+- 习近平对国有企业党的建设工作作出重要指示强调 持之以恒推进全面从严治党 为做强做优做大国有企业和国有资本提供坚强保障 蔡奇出席国有企业党的建设工作座谈会并讲话
+- 央视快评：为做强做优做大国有企业和国有资本提供坚强保障
+- 习近平将出席亚太经合组织第三十三次领导人非正式会议及相关活动
+- 同心协力共襄中华民族伟大复兴盛举——习近平总书记在纪念孙中山先生诞辰160周年大会上的重要讲话引发热烈反响
+- 李强抵达曼谷开始对泰国进行正式访问
+- 李强对推进农田水利和高标准农田建设作出重要批示强调 充分发挥高标准农田综合效益 为守牢粮食安全底线建设农业强国提供坚实支撑
+- 韩正出席2026世界中文大会开幕式并致辞
+- 【学习贯彻党的二十届五中全会精神】中央宣讲团在各地各部门宣讲党的二十届五中全会精神
+- 今年前10个月社会融资规模新增28.61万亿元
+- 深圳准备就绪 以高水平服务保障APEC盛会
+- 国内联播快讯
+- 俄称绝不接受外国军队在乌驻扎 乌称欧洲代表将参加下一轮谈判
+- 国际联播快讯
+
 ## 三、GitHub 本周新建高星项目
 
-- [huamidev/GestaltX](https://github.com/huamidev/GestaltX) ｜ 7182 ★ ｜ An MobileGestalt editor for iOS 27.x, featuring region-code tweaks, device presets, backups.
-- [tangerineturtle1/NX2navi](https://github.com/tangerineturtle1/NX2navi) ｜ 3718 ★ ｜ 
-- [jhaizhou-ops/S2Arm](https://github.com/jhaizhou-ops/S2Arm) ｜ 2838 ★ ｜ Run your own Switch games natively on iPhone, iPad and Mac: game code rewritten to ARM64, graphics direct to M
-- [Kianuni/Erosion-CN](https://github.com/Kianuni/Erosion-CN) ｜ 1854 ★ ｜ iOS / iPadOS 系统配置与 MobileGestalt 研究工具箱（简体中文防白苹果安全加固版）
-- [HybridRobotics/supermimic](https://github.com/HybridRobotics/supermimic) ｜ 1405 ★ ｜ Humanoid whole-body motion tracking with one differentiable world model.
-- [agentes-chat/agentes-chat](https://github.com/agentes-chat/agentes-chat) ｜ 1285 ★ ｜ Open-source, self-hosted Slack alternative where your team and AI agents work together in channels and DMs. Ag
-- [apex-compute/ANR](https://github.com/apex-compute/ANR) ｜ 1252 ★ ｜ Apex Neural Rendering (ANR) by Apex Compute
-- [FrigadeHQ/yogurt](https://github.com/FrigadeHQ/yogurt) ｜ 1158 ★ ｜ Private AI meeting notes. Free and open source.
-- [Th0rgal/satmux](https://github.com/Th0rgal/satmux) ｜ 1069 ★ ｜ Accelerate high-latency GEO inflight Wi-Fi via warm BBR TCP multiplexing + 1-RTT Ground-TLS + zlib (zero depen
-- [HolyArrs/HolyArrs](https://github.com/HolyArrs/HolyArrs) ｜ 1045 ★ ｜ One self-hosted app for your shows, movies and music.
+- [huamidev/GestaltX](https://github.com/huamidev/GestaltX) ｜ 7266 ★ ｜ An MobileGestalt editor for iOS 27.x, featuring region-code tweaks, device presets, backups.
+- [jhaizhou-ops/S2Arm](https://github.com/jhaizhou-ops/S2Arm) ｜ 2861 ★ ｜ Run your own Switch games natively on iPhone, iPad and Mac: game code rewritten to ARM64, graphics direct to M
+- [Kianuni/Erosion-CN](https://github.com/Kianuni/Erosion-CN) ｜ 1904 ★ ｜ iOS / iPadOS 系统配置与 MobileGestalt 研究工具箱（简体中文防白苹果安全加固版）
+- [HybridRobotics/supermimic](https://github.com/HybridRobotics/supermimic) ｜ 1427 ★ ｜ Humanoid whole-body motion tracking with one differentiable world model.
+- [apex-compute/ANR](https://github.com/apex-compute/ANR) ｜ 1402 ★ ｜ Apex Neural Rendering (ANR) by Apex Compute
+- [agentes-chat/agentes-chat](https://github.com/agentes-chat/agentes-chat) ｜ 1329 ★ ｜ Open-source, self-hosted Slack alternative where your team and AI agents work together in channels and DMs. Ag
+- [FrigadeHQ/yogurt](https://github.com/FrigadeHQ/yogurt) ｜ 1230 ★ ｜ Private AI meeting notes. Free and open source.
+- [HolyArrs/HolyArrs](https://github.com/HolyArrs/HolyArrs) ｜ 1084 ★ ｜ One self-hosted app for your shows, movies and music.
+- [kolbicz/WQFiles](https://github.com/kolbicz/WQFiles) ｜ 798 ★ ｜ File browser, app data manager and cache cleaner for iOS 26 and 27 (worse_query, no jailbreak)
+- [serveroshq/panel](https://github.com/serveroshq/panel) ｜ 734 ★ ｜ The open source ServerOS panel: one place to run the Linux servers you already own.
 
 ## 四、社会热点
 
@@ -221,39 +218,18 @@
 
 ## 五、AI 解读
 
-**本周中职职教高考与就业趋势分析周报**
+【本周时间节点】
+1. 江苏省教育考试院关于印发《江苏省2027年中职职教高考实施办法》的通知（适用人群：2028年6月毕业的中职生/28届）
+2. 江苏省部署2027年普通高考和普通高中学业水平考试报名工作（标题未注明日期）
+3. 江苏省第22届高等教育自学考试毕业生专场招聘会在宁顺利举行（标题未注明日期）
+4. 江苏省教育考试院关于做好江苏省2026年中等职业学校学生学业水平考试和2027年中职职教高考报名工作的通知（适用人群：2028年6月毕业的中职生/28届）
+5. 江苏省教育考试院关于印发江苏省2027年普通高校招生考试和普通高中学业水平合格性考试报名办法的通知（标题未注明日期）
 
-**一、本周重要时间节点及适用人群**
+【行业趋势】
+本期无相关信号。
 
-1. **江苏省中等职业学校学生学业水平考试和中职职教高考报名办法发布**（适用于2028年6月毕业的中职生/28届）
-   - 日期：本周内
-   - 标题：《关于印发江苏省中等职业学校学生学业水平考试和中职职教高考报名办法的通知》
-
-2. **江苏省2026年中等职业学校学生学业水平考试考前提醒**（适用于2028年6月毕业的中职生/28届）
-   - 日期：本周内
-   - 标题：《江苏省2026年中等职业学校学生学业水平考试考前提醒》
-
-3. **江苏省2026年中等职业学校学生学业水平考试顺利开考**（适用于2028年6月毕业的中职生/28届）
-   - 日期：本周内
-   - 标题：《我省2026年中等职业学校学生学业水平考试顺利开考》
-
-**二、新闻联播行业趋势解读**
-
-1. **人工智能**：新闻联播中提到“新一代通信网加快建设 筑牢高质量发展数字底座”，这表明人工智能在通信领域的应用正在加速，预示着人工智能行业将持续发展。
-
-2. **计算机网络**：新闻联播提到“我国加快推进核能综合利用”，这涉及到计算机网络在核能领域的应用，显示出计算机网络技术在能源领域的应用前景广阔。
-
-3. **就业**：新闻联播中提到“全国冬小麦播种过八成”，这反映出农业现代化对技术人才的需求，预示着相关技术专业毕业生就业前景良好。
-
-**三、本周待办事项**
-
-对于28届中职生，本周待办事项为：
-- 关注江苏省中等职业学校学生学业水平考试和中职职教高考的报名信息，确保按时完成报名手续。
-
-**四、其他信息**
-
-- 江苏省各高职院校积极开展产教融合，如江苏经贸职业技术学院、江苏卫生健康职业学院等，这为中职生提供了更多高质量就业的机会。
-- 江苏省沛县中专等多所中职学校举办各类活动，如红色经典传唱、法制教育等，旨在提升学生的综合素质和就业竞争力。
+【本周待办】
+本周无新增节点，按既有复习计划推进。
 
 ---
 
