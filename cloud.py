@@ -3,8 +3,10 @@
 社会热点雷达 · GitHub Actions 云端版（零第三方依赖）
 
     python cloud.py collect   采集一次，合并写入 data/YYYY-MM-DD.json
-    python cloud.py report    聚合最近 7 天，生成 docs/index.html（供 GitHub Pages）
+    python cloud.py report    聚合当天，生成 docs/index.html 与 docs/day-YYYYMMDD.html
 
+日报每天生成一份，同一份 HTML 写两处：index.html 是最新一期，
+day-YYYYMMDD.html 是历史快照。往期索引由 archive.py 统一维护。
 与本机版的区别：云端容器每次运行后销毁，所以不用 SQLite，
 改为把每天的去重话题存成纯文本 JSON，由 workflow 提交回仓库。
 不需要 S3、API Key 或任何第三方包。
@@ -15,6 +17,7 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import archive
 import hotspot as h
 import site_nav
 
@@ -22,7 +25,8 @@ BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
 DOCS = BASE / "docs"
 BJ = timezone(timedelta(hours=8))
-DAYS = 7
+# 聚合窗口（天）。1 = 日报；改成 3 就是三日滚动榜。
+DAYS = 1
 
 
 def now():
@@ -115,9 +119,24 @@ def merge_days(start):
     return merged, runs, day_rows
 
 
-def render(top, merged, runs, day_rows, start, top_n):
+def recent_runs(days=7):
+    """最近 N 天的采集概况，日报底部用来展示趋势。"""
+    start = (now() - timedelta(days=days - 1)).strftime("%Y-%m-%d")
+    rows = []
+    for p in sorted(DATA.glob("20??-??-??.json")):
+        if p.stem < start:
+            continue
+        try:
+            doc = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        rows.append((p.stem, doc.get("runs", 0), len(doc.get("topics", {}))))
+    return rows
+
+
+def render(top, merged, runs, trend_rows, start, top_n):
     end = now()
-    period = "%s ~ %s" % (start, end.strftime("%Y-%m-%d %H:%M"))
+    period = "%s 00:00 ~ %s" % (start, end.strftime("%H:%M"))
     raw = sum(t["count"] for t in merged.values())
     platforms = set()
     plat_count = Counter()
@@ -125,24 +144,24 @@ def render(top, merged, runs, day_rows, start, top_n):
         for p in t["platforms"]:
             platforms.add(p)
             plat_count[p] += t["count"]
-    issue = "%s 年第 %d 期" % (end.strftime("%Y"), int(end.strftime("%W")))
+    issue = "%s 周%s" % (end.strftime("%Y-%m-%d"), "一二三四五六日"[end.weekday()])
 
     parts = [
         '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width,initial-scale=1">',
-        '<title>社会热点周报 · %s</title>' % h.esc(issue), h.STYLE,
-        site_nav.head_css(),
+        '<title>社会热点日报 · %s</title>' % h.esc(issue), h.STYLE,
+        site_nav.head_css(), archive.head_css(),
         '</head><body>', site_nav.nav_html("radar"), '<div class="wrap">',
         '<header class="masthead">',
-        '<div><p class="kicker">WEEKLY PUBLIC ATTENTION DIGEST</p>',
-        '<h1>社会热点周报</h1></div>',
-        '<div class="issue"><b>%s</b>统计周期 %s<br>每周五更新 · 云端生成</div>' %
+        '<div><p class="kicker">DAILY PUBLIC ATTENTION DIGEST</p>',
+        '<h1>社会热点日报</h1></div>',
+        '<div class="issue"><b>%s</b>统计周期 %s<br>每日更新 · 云端生成</div>' %
         (h.esc(issue), h.esc(period)),
         '</header>',
         '<div class="dateline">',
         '<span>数据源 <b>%d 个公开热榜平台</b></span>' % len(platforms),
         '<span>生成于 <b>%s</b></span>' % h.esc(end.strftime("%Y-%m-%d %H:%M")),
-        '<span>本期收录 <b>%d</b> 个话题</span>' % len(merged),
+        '<span>今日收录 <b>%d</b> 个话题</span>' % len(merged),
         '</div>',
         '<div class="stats">',
     ]
@@ -152,7 +171,7 @@ def render(top, merged, runs, day_rows, start, top_n):
     parts.append('</div>')
 
     if top:
-        parts.append('<h2>本期焦点<span class="en">Editor\'s pick</span></h2>')
+        parts.append('<h2>今日焦点<span class="en">Editor\'s pick</span></h2>')
         parts.append('<p class="lede">按出现次数、跨平台覆盖与最佳排名综合排序，取前三条。</p>')
         parts.append('<div class="focus">')
         for i, (title, t) in enumerate(top[:3], 1):
@@ -169,7 +188,7 @@ def render(top, merged, runs, day_rows, start, top_n):
     if not top:
         parts.append('<div class="empty">暂无数据。采集 workflow 运行几次后这里就会有内容。</div>')
     elif not rest:
-        parts.append('<div class="empty">本期话题较少，已全部列于上方焦点区。</div>')
+        parts.append('<div class="empty">今日话题较少，已全部列于上方焦点区。</div>')
     else:
         parts.append('<p class="lede">点击标题跳转原榜单；点击任意列表头可排序，再点一次反转方向。'
                      '向下滚动时标题与表头会吸附在页面顶部。</p>')
@@ -211,23 +230,24 @@ def render(top, merged, runs, day_rows, start, top_n):
                          (h.esc(name), pct, cnt, pct))
         parts.append('</div>')
 
-    if day_rows:
-        parts.append('<h2>每日采集概览<span class="en">Log</span></h2>')
+    if trend_rows:
+        parts.append('<h2>近 7 日采集概览<span class="en">Log</span></h2>')
         parts.append('<table class="sortable"><thead><tr>'
                      '<th class="sortable" data-col="0" data-type="text" data-first="desc" title="按日期排序">日期</th>'
                      '<th class="sortable" data-col="1" data-type="num" data-first="desc" title="按采集次数排序">采集次数</th>'
                      '<th class="sortable" data-col="2" data-type="num" data-first="desc" title="按当日话题数排序">当日话题</th>'
                      '</tr></thead><tbody>')
-        for d, r, c in day_rows:
+        for d, r, c in trend_rows:
             parts.append("<tr><td data-v='%s'>%s</td><td class='num' data-v='%d'>%d</td>"
                          "<td class='num' data-v='%d'>%d</td></tr>" %
                          (h.esc(d), h.esc(d), r, r, c, c))
         parts.append('</tbody></table>')
 
-    parts.append('<div class="foot"><span>社会热点周报 · 由 GitHub Actions 定时生成 · '
+    parts.append('<div class="foot"><span>社会热点日报 · 由 GitHub Actions 每日生成 · '
                  '数据源 newsnow 公共热榜接口</span>'
                  '<span>仅汇总公开标题与链接，不含任何账号或密钥 · %s</span></div>' %
                  h.esc(end.strftime("%Y")))
+    parts.append(archive.widget("daily", start))
     parts.append('</div>')
     parts.append("""<script>
 (function(){
@@ -279,16 +299,21 @@ def report():
     cfg = h.load_config()
     DATA.mkdir(parents=True, exist_ok=True)
     DOCS.mkdir(parents=True, exist_ok=True)
-    start = (now() - timedelta(days=DAYS)).strftime("%Y-%m-%d")
-    merged, runs, day_rows = merge_days(start)
+    start = (now() - timedelta(days=DAYS - 1)).strftime("%Y-%m-%d")
+    merged, runs, _ = merge_days(start)
     ranked = sorted(merged.items(),
                     key=lambda kv: (-h.topic_score(kv[1]), -kv[1]["count"], kv[0]))
     top_n = max(1, min(200, int(cfg["top_n"])))
-    html = render(ranked[:top_n], merged, runs, day_rows, start, top_n)
+    trend = recent_runs()
+    stamp = now().strftime("%Y%m%d")
+    day_file = "day-%s.html" % stamp
+    # 把本期快照提前登记进索引，页面内嵌的往期列表才不会缺当期
+    archive.refresh(extra=[("daily", day_file, stamp)])
+    html = render(ranked[:top_n], merged, runs, trend, start, top_n)
     (DOCS / "index.html").write_text(html, encoding="utf-8")
-    (DOCS / ("week-%s.html" % now().strftime("%Y%m%d"))).write_text(html, encoding="utf-8")
-    print("report: %d topics / %d runs / docs/index.html %.1f KB" %
-          (len(merged), runs, len(html.encode("utf-8")) / 1024.0))
+    (DOCS / day_file).write_text(html, encoding="utf-8")
+    print("report: %s / %d topics / %d runs / day-%s.html %.1f KB" %
+          (start, len(merged), runs, stamp, len(html.encode("utf-8")) / 1024.0))
 
 
 def main():

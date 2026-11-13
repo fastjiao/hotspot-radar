@@ -1,7 +1,7 @@
 name: Weekly digest
 
-# UTC 周五 12:47 = 北京时间周五 20:47
-# 比 Hotspot weekly report (12:43) 晚 4 分钟，同一 concurrency 组串行执行，
+# UTC 周五 12:47 = 北京时间周五 20:47（信息差保持每周一期，每期留快照）
+# 比 Hotspot daily report (12:43) 晚 4 分钟，同一 concurrency 组串行执行，
 # 避免两个 workflow 同时 commit docs/ 造成 non-fast-forward。
 # 避开整点：GitHub Actions 整点排队最容易延迟甚至丢弃。
 on:
@@ -44,7 +44,8 @@ jobs:
           git config user.name "hotspot-bot"
           git config user.email "hotspot-bot@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
-          git add docs/digest.html docs/digest.md
+          # 本期快照 digest-YYYYMMDD.*、归档索引与静态归档页一并提交
+          git add docs/
           if git diff --cached --quiet; then
             echo "No digest changes"
             exit 0

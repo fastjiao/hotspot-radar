@@ -2,25 +2,33 @@
 """
 热点信息差 · GitHub Actions 周报（零第三方依赖，纯标准库）
 
-    python digest.py           生成 docs/digest.html + docs/digest.md
+    python digest.py           生成 docs/digest.html + digest-YYYYMMDD.html 快照
     python digest.py --dry     只抓取并打印统计，不写文件
 
 设计原则：
   1. 每个数据源独立 try/except，单个站点挂掉只标注、不影响整期产出；
-  2. 不依赖 AI 也能出完整周报；配了 LLM_API_KEY 才追加「AI 解读」一节；
-  3. 产物写 docs/，由 GitHub Pages 发布，不覆盖已有的 docs/index.html。
+  2. 不依赖 AI 也能出完整一期；配了 LLM_API_KEY 才追加「AI 解读」一节；
+  3. digest.html 恒为最新一期，digest-YYYYMMDD.* 是往期快照；
+     往期索引与归档页由 archive.py 统一维护。
 
 可选环境变量（不配不报错）：
-  LLM_API_KEY   OpenAI 兼容接口的密钥，放仓库 Secrets
-  LLM_BASE_URL  默认 https://api.groq.com/openai/v1
-  LLM_MODEL     默认 llama-3.3-70b-versatile
+  LLM_API_KEY   OpenAI 兼容接口的密钥，放仓库 Secrets（不是 GITHUB_TOKEN）
+  LLM_BASE_URL  默认 https://open.bigmodel.cn/api/paas/v4（智谱，国内直连）
+  LLM_MODEL     默认 glm-4-flash（智谱永久免费模型）
+                 换 Groq：base https://api.groq.com/openai/v1 / model openai/gpt-oss-120b
+                 换 OpenRouter：base https://openrouter.ai/api/v1 / model <xxx>:free
   GITHUB_TOKEN  Actions 自动注入，用于调用 api.github.com（本地没有也能跑）
+
+注意：Groq / Gemini 对中国大陆出口 IP 返回 403，本地连控制台都打不开，
+所以默认改用国内可直连的智谱。GitHub Actions 的 runner 在美国，
+若想换回 Groq 反而更快，只需设上面两个 Variables，不用改代码。
 """
 import argparse
 import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -28,6 +36,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
 
+import archive
 import site_nav
 
 BASE = Path(__file__).resolve().parent
@@ -291,9 +300,16 @@ def collect_radar(days=7):
 def ai_digest(text):
     key = os.environ.get("LLM_API_KEY", "").strip()
     if not key:
-        return None, "未配置 LLM_API_KEY"
-    base = os.environ.get("LLM_BASE_URL", "https://api.groq.com/openai/v1").rstrip("/")
-    model = os.environ.get("LLM_MODEL", "llama-3.3-70b-versatile")
+        return None, "未配置 LLM_API_KEY（仓库 Settings → Secrets and variables → Actions）"
+    # 默认智谱：控制台与 API 国内可直连、glm-4-flash 永久免费、中文摘要够用。
+    # Groq / Gemini 对大陆出口 IP 返回 403，本地拿不到 key，故不作默认。
+    # 如需换回，设 LLM_BASE_URL=https://api.groq.com/openai/v1
+    # 与 LLM_MODEL=openai/gpt-oss-120b 即可（Actions runner 在美国，更快）。
+    # workflow 里 ${{ vars.X }} 未配置时会展开成空字符串（变量存在但值为空），
+    # os.environ.get 的默认值在这种情况下不生效，必须用 or 显式兜底。
+    base = ((os.environ.get("LLM_BASE_URL") or "").strip().rstrip("/")
+            or "https://open.bigmodel.cn/api/paas/v4")
+    model = (os.environ.get("LLM_MODEL") or "").strip() or "glm-4-flash"
     prompt = (
         "你是中职职教高考与就业趋势分析助手。下面是本周采集到的原始标题，"
         "请输出中文周报解读：①本周最重要的 3-5 个时间节点，"
@@ -305,22 +321,34 @@ def ai_digest(text):
     body = json.dumps({"model": model,
                        "messages": [{"role": "user", "content": prompt}],
                        "temperature": 0.3, "max_tokens": 1600}).encode("utf-8")
-    req = urllib.request.Request(base + "/chat/completions", data=body, headers={
-        "Authorization": "Bearer " + key, "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=90) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        return data["choices"][0]["message"]["content"].strip(), None
-    except Exception as e:
-        return None, "%s: %s" % (type(e).__name__, str(e)[:100])
+    last = ""
+    for attempt in range(2):
+        req = urllib.request.Request(base + "/chat/completions", data=body, headers={
+            "Authorization": "Bearer " + key, "Content-Type": "application/json",
+            "User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            return data["choices"][0]["message"]["content"].strip(), None
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", "replace")[:200]
+            last = "HTTP %s %s" % (e.code, detail)
+            if e.code not in (429, 500, 502, 503, 504):
+                break
+        except Exception as e:
+            last = "%s: %s" % (type(e).__name__, str(e)[:150])
+        if attempt == 0:
+            time.sleep(3)
+    return None, last
 
 
 def render_html(ctx):
     p = []
     p.append('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">')
     p.append('<meta name="viewport" content="width=device-width,initial-scale=1">')
-    p.append('<title>热点信息差 · %s</title><style>%s</style>%s</head><body>%s<div class="wrap">'
-             % (esc(ctx["date"]), CSS, site_nav.head_css(), site_nav.nav_html("digest")))
+    p.append('<title>热点信息差 · %s</title><style>%s</style>%s%s</head><body>%s<div class="wrap">'
+             % (esc(ctx["date"]), CSS, site_nav.head_css(), archive.head_css(),
+                site_nav.nav_html("digest")))
     p.append('<header><h1>热点信息差</h1><div class="dateline">第 %s 期 · %s — %s · 每周五更新</div></header>'
              % (esc(ctx["issue"]), esc(ctx["start"]), esc(ctx["date"])))
 
@@ -395,12 +423,17 @@ def render_html(ctx):
     if ctx["ai_text"]:
         p.append('<div class="ai">%s</div>' % esc(ctx["ai_text"]))
     else:
-        p.append('<div class="empty">%s。在仓库 Secrets 配置 LLM_API_KEY 后，'
-                 '本会自动追加趋势解读与 28 届待办。</div>' % esc(ctx["ai_status"]))
+        p.append('<div class="empty">%s。<br>启用方式：仓库 Settings → Secrets and variables '
+                 '→ Actions → New repository secret，添加 <code>LLM_API_KEY</code>'
+                 '（默认用智谱 open.bigmodel.cn 的免费 glm-4-flash，国内可直连）；'
+                 '若要换 Groq / OpenRouter，再在 Variables 里设 LLM_BASE_URL / LLM_MODEL。'
+                 '配置后本会自动追加趋势解读与 28 届待办，无需改代码。</div>'
+                 % esc(ctx["ai_status"]))
 
     p.append('<footer>适用对象标签按「职教高考年份 = 中职毕业年份」自动推断，'
              '凡推断结果均标注「预计」，请以官方原文为准。数据源见各节链接。'
              '由 GitHub Actions 于 %s 生成。</footer>' % esc(ctx["generated"]))
+    p.append(archive.widget("digest", ctx["date"]))
     p.append('</div></body></html>')
     return "\n".join(p)
 
@@ -442,7 +475,8 @@ def render_md(ctx):
           for r in ctx["radar"]] or ["暂无近 7 天采集数据。"]
     p += ["", "## 五、AI 解读", "",
           ctx["ai_text"] or ("%s。配置 LLM_API_KEY 后自动生成。" % ctx["ai_status"]), "",
-          "---", "", "适用对象为按年份自动推断，标注「预计」者请以官方原文为准。", ""]
+          "---", "", "往期归档：archive.html", "",
+          "适用对象为按年份自动推断，标注「预计」者请以官方原文为准。", ""]
     return "\n".join(p)
 
 
@@ -498,7 +532,8 @@ def main():
         payload.append("[新闻联播 %s] %s" % (d["date"], "；".join(d["items"])))
     payload.append("[GitHub] " + "；".join(g["title"] for g in ctx["github"]))
     ctx["ai_text"], ai_err = ai_digest("\n".join(payload))
-    ctx["ai_status"] = "已启用（%s）" % os.environ.get("LLM_MODEL", "外部模型") if ctx["ai_text"] else (ai_err or "未启用")
+    model_label = (os.environ.get("LLM_MODEL") or "").strip() or "glm-4-flash"
+    ctx["ai_status"] = ("已启用（%s）" % model_label) if ctx["ai_text"] else (ai_err or "未启用")
     print("      %s" % ctx["ai_status"])
 
     if args.dry:
@@ -506,10 +541,18 @@ def main():
         return 0
 
     DOCS.mkdir(parents=True, exist_ok=True)
-    (DOCS / "digest.html").write_text(render_html(ctx), encoding="utf-8")
-    (DOCS / "digest.md").write_text(render_md(ctx), encoding="utf-8")
-    print("已生成 docs/digest.html (%d 字节) 与 docs/digest.md"
-          % (DOCS / "digest.html").stat().st_size)
+    stamp = today.strftime("%Y%m%d")
+    snap_html = "digest-%s.html" % stamp
+    snap_md = "digest-%s.md" % stamp
+    # 把本期快照提前登记进索引，页面内嵌的往期列表才不会缺当期
+    archive.refresh(extra=[("digest", snap_html, stamp)])
+    html, md = render_html(ctx), render_md(ctx)
+    (DOCS / "digest.html").write_text(html, encoding="utf-8")
+    (DOCS / "digest.md").write_text(md, encoding="utf-8")
+    (DOCS / snap_html).write_text(html, encoding="utf-8")
+    (DOCS / snap_md).write_text(md, encoding="utf-8")
+    print("已生成 docs/digest.html + %s (%.1f KB)"
+          % (snap_html, len(html.encode("utf-8")) / 1024.0))
     return 0
 
 

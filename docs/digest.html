@@ -55,7 +55,25 @@ body > .wrap{animation:wb-enter .3s ease-out both}
 @media(max-width:600px){.wb-nav-inner{padding:.5rem .7rem;flex-wrap:wrap}
 .wb-nav a.wb-nav-link{padding:5px 10px;font-size:.8rem}}
 </style>
-</head><body><nav class="wb-nav" aria-label="站点导航"><div class="wb-nav-inner"><a class="wb-nav-brand" href="/">Lovejiao</a><div class="wb-nav-links"><a class="wb-nav-link" href="/">首页</a><a class="wb-nav-link" href="/hotspot-radar/">社会热点周报</a><a class="wb-nav-link is-active" href="/hotspot-radar/digest.html" aria-current="page">热点信息差</a></div></div></nav><div class="wrap">
+<style data-wb-arch>
+.wb-arch{max-width:900px;margin:48px auto 0;padding:18px 0 0;
+border-top:1px solid #d8d3c8;
+font:13px/1.6 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+@media(max-width:940px){.wb-arch{margin-left:20px;margin-right:20px}}
+.wb-arch-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:12px}
+.wb-arch h2{margin:0;padding:0;border:0;font-size:16px;font-weight:500;color:inherit;
+letter-spacing:0;font-family:inherit}
+.wb-arch a.wb-arch-all{font-size:12px;color:#6366F1;text-decoration:none;white-space:nowrap}
+.wb-arch a.wb-arch-all:hover{text-decoration:underline}
+.wb-arch-list{display:flex;flex-wrap:wrap;gap:8px}
+.wb-arch-list a{display:inline-block;padding:5px 11px;border:1px solid #d8d3c8;border-radius:999px;
+background:#fff;color:#4a4d58;text-decoration:none;font-size:12px;white-space:nowrap}
+.wb-arch-list a:hover{border-color:#6366F1;color:#6366F1;text-decoration:none}
+.wb-arch-list a.is-current{background:#6366F1;border-color:#6366F1;color:#fff}
+.wb-arch-empty{color:#6b675f;font-size:12px}
+@media(max-width:600px){.wb-arch h2{font-size:14px}}
+</style>
+</head><body><nav class="wb-nav" aria-label="站点导航"><div class="wb-nav-inner"><a class="wb-nav-brand" href="/">Lovejiao</a><div class="wb-nav-links"><a class="wb-nav-link" href="/">首页</a><a class="wb-nav-link" href="/hotspot-radar/">社会热点日报</a><a class="wb-nav-link is-active" href="/hotspot-radar/digest.html" aria-current="page">热点信息差</a><a class="wb-nav-link" href="/hotspot-radar/archive.html">往期归档</a></div></div></nav><div class="wrap">
 <header><h1>热点信息差</h1><div class="dateline">第 202645 期 · 2026-11-06 — 2026-11-13 · 每周五更新</div></header>
 <div class="status"><strong>本期采集状态</strong>：政务/招生站点 4/6 可用；新闻联播 7/7 天取到；AI 解读：未配置 LLM_API_KEY。失败源只标注、不影响其余内容。</div>
 <h2>本周时间节点提醒</h2>
@@ -186,6 +204,29 @@ body > .wrap{animation:wb-enter .3s ease-out both}
 <tr><td><a href="https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369526&amp;amp;topic_name=LPL%E9%A6%96%E6%AC%A1%E5%9C%A8S%E8%B5%9BBO5%E6%88%98%E8%83%9CFaker" target="_blank" rel="noopener">LPL首次在S赛BO5战胜Faker</a></td><td>6</td><td>1</td></tr>
 </table>
 <h2>五、AI 解读</h2>
-<div class="empty">未配置 LLM_API_KEY。在仓库 Secrets 配置 LLM_API_KEY 后，本会自动追加趋势解读与 28 届待办。</div>
+<div class="empty">未配置 LLM_API_KEY（仓库 Settings → Secrets and variables → Actions）。<br>启用方式：仓库 Settings → Secrets and variables → Actions → New repository secret，添加 <code>LLM_API_KEY</code>（默认用智谱 open.bigmodel.cn 的免费 glm-4-flash，国内可直连）；若要换 Groq / OpenRouter，再在 Variables 里设 LLM_BASE_URL / LLM_MODEL。配置后本会自动追加趋势解读与 28 届待办，无需改代码。</div>
 <footer>适用对象标签按「职教高考年份 = 中职毕业年份」自动推断，凡推断结果均标注「预计」，请以官方原文为准。数据源见各节链接。由 GitHub Actions 于 2026-11-13 18:17 (UTC+8) 生成。</footer>
-</div></body></html>
+</div><section class="wb-arch" data-wb-arch="digest"><div class="wb-arch-head"><h2>往期信息差</h2><a class="wb-arch-all" href="archive.html">全部归档 →</a></div><div class="wb-arch-list" data-wb-arch-list><a href="digest-20261113.html">信息差 · 2026-11-13 周五</a></div></section><script data-wb-arch>
+(function(){
+  var box=document.querySelector('.wb-arch[data-wb-arch="digest"]');
+  if(!box||!window.fetch)return;
+  var list=box.querySelector('[data-wb-arch-list]'),cur="";
+  fetch('archive.json',{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw new Error('http '+r.status);return r.json();
+  }).then(function(d){
+    var items=d['digest']||[];if(!items.length)return;
+    list.textContent='';
+    items.slice(0,12).forEach(function(it){
+      var a=document.createElement('a');a.href=it.url;
+      a.textContent=(it.type?it.type+' · ':'')+it.label;
+      if(cur&&it.date===cur)a.className='is-current';
+      list.appendChild(a);
+    });
+    if(items.length>12){
+      var m=document.createElement('a');m.href='archive.html';
+      m.textContent='更多 '+(items.length-12)+' 期 →';list.appendChild(m);
+    }
+  }).catch(function(){});
+})();
+</script>
+</body></html>

@@ -59,8 +59,9 @@ body > .wrap{animation:wb-enter .3s ease-out both}
 
 _LINKS = (
     ("home", "/", "首页"),
-    ("radar", "/hotspot-radar/", "社会热点周报"),
+    ("radar", "/hotspot-radar/", "社会热点日报"),
     ("digest", "/hotspot-radar/digest.html", "热点信息差"),
+    ("archive", "/hotspot-radar/archive.html", "往期归档"),
 )
 
 
@@ -104,12 +105,18 @@ def main():
         print(__doc__)
         return 0
     docs = Path(__file__).resolve().parent / "docs"
-    targets = [(docs / "index.html", "radar"), (docs / "digest.html", "digest")]
-    targets += [(p, "radar") for p in sorted(docs.glob("week-*.html"))]
+    targets = []
+    for p in sorted(docs.glob("*.html")):
+        if p.name == "archive.html":
+            current = "archive"
+        elif p.name.startswith("digest"):
+            current = "digest"
+        else:
+            current = "radar"
+        targets.append((p, current))
     for path, current in targets:
-        if path.exists():
-            size = patch_file(path, current)
-            print("patched %-24s %d chars" % (path.name, size))
+        size = patch_file(path, current)
+        print("patched %-24s %d chars" % (path.name, size))
     return 0
 
 

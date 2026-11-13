@@ -1,10 +1,11 @@
-name: Hotspot weekly report
+name: Hotspot daily report
 
-# UTC 周五 12:43 = 北京时间周五 20:43
-# cron 星期位：0/7=周日，5=周五
+# UTC 每天 12:43 = 北京时间每天 20:43
+# 与 Weekly digest（周五 20:47）共用同一 concurrency 组串行执行。
+# 避开整点：GitHub Actions 整点排队最容易延迟甚至丢弃。
 on:
   schedule:
-    - cron: '43 12 * * 5'
+    - cron: '43 12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Build weekly report
+      - name: Build daily report
         run: python cloud.py report
 
       - name: Commit report
@@ -42,5 +43,5 @@ jobs:
             echo "No report changes"
             exit 0
           fi
-          git commit -m "report: week $(date -u +%Y-%m-%d)"
+          git commit -m "report: day $(date -u +%Y-%m-%d)"
           git push origin HEAD:"${{ github.ref_name }}"
