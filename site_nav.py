@@ -25,28 +25,23 @@ from pathlib import Path
 
 NAV_CSS = """
 .wb-nav{position:sticky;top:0;z-index:100;width:100vw;margin-left:calc(50% - 50vw);
-box-sizing:border-box;background:rgba(240,243,248,.78);
-backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-border-bottom:1px solid rgba(255,255,255,.7);
-box-shadow:0 8px 30px rgba(2,6,23,.10);
+box-sizing:border-box;background:rgba(250,248,243,.28);
+backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+border-bottom:1px solid rgba(0,0,0,.06);
+box-shadow:0 4px 18px rgba(2,6,23,.05);
 font:13px/1.5 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-.wb-nav::before{content:"";display:block;height:3px;
-background:linear-gradient(90deg,#6366F1 0%,#A855F7 45%,#b23a24 100%)}
-.wb-nav::after{content:"";position:absolute;left:0;right:0;top:100%;height:52px;
-background:linear-gradient(180deg,rgba(240,243,248,.85),rgba(250,248,243,0));
-pointer-events:none}
 .wb-nav-inner{max-width:1200px;margin:0 auto;padding:.6rem 1rem;
 display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .wb-nav a.wb-nav-brand{font-weight:700;font-size:1.05rem;color:#1b1a17;
 text-decoration:none;letter-spacing:-.02em;white-space:nowrap}
 .wb-nav-links{display:flex;gap:2px;flex-wrap:wrap;align-items:center;padding:4px;
-border:1px solid rgba(255,255,255,.75);border-radius:999px;
-background:rgba(255,255,255,.4);
+border:1px solid rgba(0,0,0,.06);border-radius:999px;
+background:rgba(255,255,255,.35);
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .wb-nav a.wb-nav-link{color:#4a4d58;text-decoration:none;padding:6px 16px;
 font-size:.88rem;border-radius:999px;white-space:nowrap;
 transition:color 200ms ease,background 200ms ease,transform 200ms ease}
-.wb-nav a.wb-nav-link:hover{color:#111;background:rgba(255,255,255,.9);text-decoration:none}
+.wb-nav a.wb-nav-link:hover{color:#111;background:rgba(255,255,255,.85);text-decoration:none}
 .wb-nav a.wb-nav-link.is-active{color:#fff;background:#6366F1;font-weight:700;
 transform:scale(1.06);box-shadow:0 2px 12px rgba(99,102,241,.35)}
 body{overflow-x:clip}

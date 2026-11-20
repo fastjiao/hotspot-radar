@@ -13,7 +13,6 @@ day-YYYYMMDD.html 是历史快照。往期索引由 archive.py 统一维护。
 """
 import argparse
 import json
-from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -119,32 +118,49 @@ def merge_days(start):
     return merged, runs, day_rows
 
 
-def recent_runs(days=7):
-    """最近 N 天的采集概况，日报底部用来展示趋势。"""
-    start = (now() - timedelta(days=days - 1)).strftime("%Y-%m-%d")
-    rows = []
-    for p in sorted(DATA.glob("20??-??-??.json")):
-        if p.stem < start:
-            continue
-        try:
-            doc = json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        rows.append((p.stem, doc.get("runs", 0), len(doc.get("topics", {}))))
-    return rows
+def classify(title):
+    """按关键词把话题归入主题分类；未命中归「其他」。
+
+    分类名本身是固定词表，但页面只展示当天实际出现过的分类
+    （动态显隐），所以用户看到的分类是随内容每天变化的。
+    """
+    t = title.lower()
+    rules = (
+        ("国际·外交", ("apec", "g20", "关税", "特朗普", "中美", "中美关系",
+                       "普京", "乌克兰", "俄乌", "联合国", "外交", "访华", "巴以", "以色列",
+                       "金砖", "上合", "欧盟", "北约", "制裁")),
+        ("科技·AI", ("ai", "人工智能", "大模型", "gpt", "openai", "deepseek",
+                     "芯片", "半导体", "算力", "机器人", "马斯克", "苹果", "华为",
+                     "自动驾驶", "量子", "卫星", "航天", "火箭", "5g", "6g", "模型")),
+        ("财经", ("股市", "股票", "a股", "港股", "美股", "基金", "央行", "降息",
+                  "加息", "汇率", "人民币", "黄金", "楼市", "房价", "地产", "财报",
+                  "上市公司", "ipo", "债券", "物价", "cpi", "通胀")),
+        ("社会民生", ("教育", "医疗", "医保", "养老", "房价", "就业", "工资",
+                      "食品安全", "交通", "事故", "灾害", "地震", "天气", "台风",
+                      "疫情", "疫苗", "结婚", "离婚", "生育", "高考", "考研")),
+        ("体育·娱乐", ("世界杯", "足球", "篮球", "nba", "cba", "奥运会", "亚运会",
+                       "电竞", "电影", "电视剧", "综艺", "明星", "歌手", "演唱会",
+                       "票房", "游戏", "动漫")),
+    )
+    for cat, kws in rules:
+        for kw in kws:
+            if kw in t:
+                return cat
+    return "其他"
 
 
-def render(top, merged, runs, trend_rows, start, top_n):
+def render(top, merged, runs, start, top_n):
     end = now()
-    period = "%s 00:00 ~ %s" % (start, end.strftime("%H:%M"))
+    period = "%s 00:00 ~ 23:59" % start
     raw = sum(t["count"] for t in merged.values())
     platforms = set()
-    plat_count = Counter()
     for t in merged.values():
         for p in t["platforms"]:
             platforms.add(p)
-            plat_count[p] += t["count"]
     issue = "%s 周%s" % (end.strftime("%Y-%m-%d"), "一二三四五六日"[end.weekday()])
+    # 给每个话题打上主题分类，供筛选使用
+    for title, t in merged.items():
+        t["cat"] = classify(title)
 
     parts = [
         '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
@@ -171,14 +187,29 @@ def render(top, merged, runs, trend_rows, start, top_n):
     parts.append('</div>')
 
     if top:
+        # 当天实际出现过的分类（按规则定义顺序 + 其他兜底）
+        cat_order = ("国际·外交", "科技·AI", "财经", "社会民生", "体育·娱乐")
+        cats_present = [c for c in cat_order
+                        if any(t["cat"] == c for _, t in merged.items())]
+        if any(t["cat"] == "其他" for _, t in merged.items()):
+            cats_present.append("其他")
+        parts.append('<div class="focus-head">')
         parts.append('<h2>今日焦点<span class="en">Editor\'s pick</span></h2>')
-        parts.append('<p class="lede">按出现次数、跨平台覆盖与最佳排名综合排序，取前三条。</p>')
+        parts.append('<label class="filter"><span>筛选主题</span><select id="cat-filter">'
+                     '<option value="all">全部话题</option>')
+        for c in cats_present:
+            parts.append('<option value="%s">%s</option>' % (h.esc(c), h.esc(c)))
+        parts.append('</select></label>')
+        parts.append('</div>')
+        parts.append('<p class="lede">按出现次数、跨平台覆盖与最佳排名综合排序，取前三条。'
+                     '可用右上角下拉按主题筛选，焦点与下方榜单联动。</p>')
         parts.append('<div class="focus">')
         for i, (title, t) in enumerate(top[:3], 1):
-            parts.append('<article><div class="no">焦点 %02d</div>' % i)
+            parts.append('<article data-cat="%s"><div class="no">焦点 %02d</div>' %
+                         (h.esc(t["cat"]), i))
             parts.append('<h3>%s</h3>' % h.make_link(title, t["url"]))
-            parts.append('<div class="meta">出现 %d 次 · %d 个平台 · 最佳第 %d 名</div>' %
-                         (t["count"], len(t["platforms"]), t["best"]))
+            parts.append('<div class="meta">%s · 出现 %d 次 · %d 个平台 · 最佳第 %d 名</div>' %
+                         (h.esc(t["cat"]), t["count"], len(t["platforms"]), t["best"]))
             parts.append('</article>')
         parts.append('</div>')
 
@@ -190,8 +221,8 @@ def render(top, merged, runs, trend_rows, start, top_n):
     elif not rest:
         parts.append('<div class="empty">今日话题较少，已全部列于上方焦点区。</div>')
     else:
-        parts.append('<p class="lede">点击标题跳转原榜单；点击任意列表头可排序，再点一次反转方向。'
-                     '向下滚动时标题与表头会吸附在页面顶部。</p>')
+        parts.append('<p class="lede">点击话题所在整行即可跳转原榜单；点击列表头可排序，'
+                     '再点一次反转方向。向下滚动时标题与表头会吸附在页面顶部。</p>')
         parts.append('<table class="sortable" id="ranking"><thead><tr>'
                      '<th class="sortable" data-col="0" data-type="num" data-first="asc" title="按序号排序">序</th>'
                      '<th class="sortable" data-col="1" data-type="text" data-first="asc" title="按话题名称排序">话题</th>'
@@ -204,44 +235,21 @@ def render(top, merged, runs, trend_rows, start, top_n):
             tags = "".join('<span class="tag">%s</span>' % h.esc(p)
                            for p in sorted(t["platforms"]))
             first = t["first"][:16].replace("T", " ")
+            url = t["url"] if t["url"] and t["url"].startswith(("http://", "https://")) else ""
             parts.append(
-                "<tr><td class='rank' data-v='%d'>%d</td>"
+                "<tr data-cat='%s' data-href='%s'>"
+                "<td class='rank' data-v='%d'>%d</td>"
                 "<td class='topic' data-v='%s'>%s</td>"
                 "<td class='num' data-v='%d'>%d</td>"
                 "<td data-v='%d'>%s</td>"
                 "<td class='num' data-v='%d'>%d</td>"
                 "<td class='num hide' data-v='%s'>%s</td></tr>" %
-                (i, i, h.esc(title), h.make_link(title, t["url"]),
+                (h.esc(t["cat"]), h.esc(url),
+                 i, i, h.esc(title), h.make_link(title, t["url"]),
                  t["count"], t["count"], len(t["platforms"]), tags,
                  t["best"], t["best"], h.esc(first), h.esc(first)))
         parts.append('</tbody></table>')
     parts.append('</section>')
-
-    if plat_count:
-        parts.append('<h2>平台覆盖<span class="en">Sources</span></h2>')
-        parts.append('<p class="lede">各平台累计被采集到的条目占比。</p>')
-        total = sum(plat_count.values())
-        parts.append('<div class="bars">')
-        for name, cnt in plat_count.most_common():
-            pct = 100.0 * cnt / total
-            parts.append('<div class="bar"><span class="nm">%s</span>'
-                         '<span class="track"><span class="fill" style="width:%.1f%%"></span></span>'
-                         '<span class="v">%d · %.1f%%</span></div>' %
-                         (h.esc(name), pct, cnt, pct))
-        parts.append('</div>')
-
-    if trend_rows:
-        parts.append('<h2>近 7 日采集概览<span class="en">Log</span></h2>')
-        parts.append('<table class="sortable"><thead><tr>'
-                     '<th class="sortable" data-col="0" data-type="text" data-first="desc" title="按日期排序">日期</th>'
-                     '<th class="sortable" data-col="1" data-type="num" data-first="desc" title="按采集次数排序">采集次数</th>'
-                     '<th class="sortable" data-col="2" data-type="num" data-first="desc" title="按当日话题数排序">当日话题</th>'
-                     '</tr></thead><tbody>')
-        for d, r, c in trend_rows:
-            parts.append("<tr><td data-v='%s'>%s</td><td class='num' data-v='%d'>%d</td>"
-                         "<td class='num' data-v='%d'>%d</td></tr>" %
-                         (h.esc(d), h.esc(d), r, r, c, c))
-        parts.append('</tbody></table>')
 
     parts.append('<div class="foot"><span>社会热点日报 · 由 GitHub Actions 每日生成 · '
                  '数据源 newsnow 公共热榜接口</span>'
@@ -289,6 +297,40 @@ def render(top, merged, runs, trend_rows, start, top_n):
       });
     });
   });
+
+  // 整行点击跳转：点击榜单任意一行（含序号格）打开话题链接
+  document.querySelectorAll('tr[data-href]').forEach(function(row){
+    var href=row.getAttribute('data-href');
+    if(!href){return;}
+    row.style.cursor='pointer';
+    row.setAttribute('tabindex','0');
+    row.setAttribute('role','link');
+    row.addEventListener('click',function(e){
+      // 若点击落在行内真实链接上，交给链接自身处理，避免重复打开
+      if(e.target && e.target.closest && e.target.closest('a')){return;}
+      window.open(href,'_blank','noopener');
+    });
+    row.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){window.open(href,'_blank','noopener');}
+    });
+  });
+
+  // 主题筛选：焦点卡片与热度榜单联动
+  var sel=document.getElementById('cat-filter');
+  if(sel){
+    function applyFilter(){
+      var v=sel.value;
+      document.querySelectorAll('.focus article').forEach(function(card){
+        var show=(v==='all')||(card.getAttribute('data-cat')===v);
+        card.style.display=show?'':'none';
+      });
+      document.querySelectorAll('#ranking tbody tr').forEach(function(row){
+        var show=(v==='all')||(row.getAttribute('data-cat')===v);
+        row.style.display=show?'':'none';
+      });
+    }
+    sel.addEventListener('change',applyFilter);
+  }
 })();
 </script>""")
     parts.append('</body></html>')
@@ -304,12 +346,11 @@ def report():
     ranked = sorted(merged.items(),
                     key=lambda kv: (-h.topic_score(kv[1]), -kv[1]["count"], kv[0]))
     top_n = max(1, min(200, int(cfg["top_n"])))
-    trend = recent_runs()
     stamp = now().strftime("%Y%m%d")
     day_file = "day-%s.html" % stamp
     # 把本期快照提前登记进索引，页面内嵌的往期列表才不会缺当期
     archive.refresh(extra=[("daily", day_file, stamp)])
-    html = render(ranked[:top_n], merged, runs, trend, start, top_n)
+    html = render(ranked[:top_n], merged, runs, start, top_n)
     (DOCS / "index.html").write_text(html, encoding="utf-8")
     (DOCS / day_file).write_text(html, encoding="utf-8")
     print("report: %s / %d topics / %d runs / day-%s.html %.1f KB" %

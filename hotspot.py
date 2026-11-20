@@ -152,6 +152,15 @@ h2{margin:46px 0 0;padding-bottom:10px;border-bottom:2px solid var(--ink);
 h2 .en{float:right;font:400 10px/2.8 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
  letter-spacing:.22em;color:var(--muted)}
 .lede{margin:10px 0 20px;font-size:12px;color:var(--muted)}
+.focus-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.focus-head h2{flex:1}
+.filter{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
+ white-space:nowrap}
+.filter select{font:inherit;font-size:12px;color:var(--ink);background:var(--paper);
+ border:1px solid var(--rule);border-radius:6px;padding:5px 10px;cursor:pointer}
+.filter select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+tr[data-href]{cursor:pointer}
+tr[data-href]:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .focus{display:grid;grid-template-columns:2fr 1fr 1fr;border-bottom:1px solid var(--rule)}
 .focus article{padding:24px 22px 26px;border-left:1px solid var(--line)}
 .focus article:first-child{border-left:none;padding-left:0}
