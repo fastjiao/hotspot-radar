@@ -255,12 +255,14 @@ def render(top, merged, runs, start, top_n):
                  '数据源 newsnow 公共热榜接口</span>'
                  '<span>仅汇总公开标题与链接，不含任何账号或密钥 · %s</span></div>' %
                  h.esc(end.strftime("%Y")))
-    parts.append(archive.widget("daily", start))
     parts.append('</div>')
+    parts.append(archive.widget("daily", start))
     parts.append("""<script>
 (function(){
   var head=document.getElementById('rank-head');
   if(head){document.documentElement.style.setProperty('--head-h',head.offsetHeight+'px');}
+  var nav=document.querySelector('.wb-nav');
+  if(nav){document.documentElement.style.setProperty('--nav-h',nav.offsetHeight+'px');}
   document.querySelectorAll('table.sortable').forEach(function(table){
     var tbody=table.tBodies[0];
     var ths=Array.prototype.slice.call(table.querySelectorAll('thead th.sortable'));

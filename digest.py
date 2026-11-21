@@ -7,29 +7,14 @@
 
 设计原则：
   1. 每个数据源独立 try/except，单个站点挂掉只标注、不影响整期产出；
-  2. 不依赖 AI 也能出完整一期；配了 LLM_API_KEY 才追加「AI 解读」一节；
-  3. digest.html 恒为最新一期，digest-YYYYMMDD.* 是往期快照；
+  2. digest.html 恒为最新一期，digest-YYYYMMDD.* 是往期快照；
      往期索引与归档页由 archive.py 统一维护。
-
-可选环境变量（不配不报错）：
-  LLM_API_KEY   OpenAI 兼容接口的密钥，放仓库 Secrets（不是 GITHUB_TOKEN）
-  LLM_BASE_URL  默认 https://open.bigmodel.cn/api/paas/v4（智谱，国内直连）
-  LLM_MODEL     默认 glm-4-flash（智谱永久免费模型）
-                 换 Groq：base https://api.groq.com/openai/v1 / model openai/gpt-oss-120b
-                 换 OpenRouter：base https://openrouter.ai/api/v1 / model <xxx>:free
-  GITHUB_TOKEN  Actions 自动注入，用于调用 api.github.com（本地没有也能跑）
-
-注意：Groq / Gemini 对中国大陆出口 IP 返回 403，本地连控制台都打不开，
-所以默认改用国内可直连的智谱。GitHub Actions 的 runner 在美国，
-若想换回 Groq 反而更快，只需设上面两个 Variables，不用改代码。
 """
 import argparse
 import json
 import os
 import re
 import sys
-import time
-import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
@@ -74,8 +59,18 @@ NODE_KEYS = ("报名", "考试", "志愿", "录取", "公示", "简章", "计划
 CSS = """
 :root{--paper:#faf8f3;--ink:#1b1a17;--red:#b23a24;--muted:#6b675f;--line:#d8d3c8}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);
-font-family:"Songti SC","Noto Serif CJK SC",Georgia,serif;line-height:1.75}
-.wrap{max-width:900px;margin:0 auto;padding:36px 22px 70px}
+font-family:"Songti SC","Noto Serif CJK SC",Georgia,serif;line-height:1.75;
+display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:36px;align-items:start}
+body > .wb-nav{grid-column:1 / -1;width:auto;margin-left:0}
+body > .wrap{grid-column:2;width:100%}
+body > .wb-sidebar{grid-column:1;grid-row:2;position:sticky;top:76px}
+.wrap{max-width:none;margin:0 auto;width:100%;padding:36px 22px 70px}
+@media(max-width:900px){
+ body{display:block}
+ body > .wb-sidebar{position:static;margin-top:48px}
+ .wrap{max-width:900px;margin:0 auto}
+}
+@media(max-width:600px){h1{font-size:23px}.wrap{padding:22px 15px 50px}}
 header{border-top:4px double var(--ink);border-bottom:1px solid var(--ink);padding:14px 0 18px}
 h1{font-size:30px;margin:0;letter-spacing:2px}h2{font-size:19px;margin:38px 0 14px;
 border-bottom:1px solid var(--line);padding-bottom:7px}h3{font-size:15px;margin:22px 0 8px}
@@ -90,36 +85,12 @@ a{color:#2b4d73;text-decoration:none}a:hover{text-decoration:underline}
 .empty{color:var(--muted);font-size:13px;padding:6px 0}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;
 border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:normal}
-.ai{background:#fff;border:1px solid var(--line);padding:16px 20px;white-space:pre-wrap;font-size:14px;line-height:1.75}
-.ai strong{color:var(--ink);font-weight:600}
-.ai .ai-h{display:block;margin:14px 0 6px;font-weight:600;color:var(--ink)}
-.ai code{background:#f3f0e9;padding:1px 5px;border-radius:3px;font-size:13px}
 footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:12px;color:var(--muted);font-size:12px}
-@media(max-width:600px){h1{font-size:23px}.wrap{padding:22px 15px 50px}}
 """
 
 
 def now():
     return datetime.now(BJ)
-
-
-def md_lite(text):
-    """把模型返回的 Markdown 做最小化渲染：只认加粗与小标题。
-
-    模型输出不可信，所以先整体 HTML 转义，再做白名单替换，
-    不会引入任何脚本或原始标签。换行交给 .ai 的 white-space:pre-wrap。
-    """
-    out = esc(text)
-    # 行首 ### / ## / # 视为小标题
-    out = re.sub(r"(?m)^#{1,6}\s*(.+)$", r'<span class="ai-h">\1</span>', out)
-    # **加粗**（跨行不匹配，避免误吞）
-    out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
-    # __加粗__ 与 `代码`
-    out = re.sub(r"__(.+?)__", r"<strong>\1</strong>", out)
-    out = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", out)
-    # 行首的 "- " / "* " 项目符号换成 ·
-    out = re.sub(r"(?m)^\s*[-*]\s+", "· ", out)
-    return out
 
 
 def get(url, timeout=12, retry=1):
@@ -319,62 +290,6 @@ def collect_radar(days=7):
     return rows[:20]
 
 
-def ai_digest(text):
-    key = os.environ.get("LLM_API_KEY", "").strip()
-    if not key:
-        return None, "未配置 LLM_API_KEY（仓库 Settings → Secrets and variables → Actions）"
-    # 默认智谱：控制台与 API 国内可直连、glm-4-flash 永久免费、中文摘要够用。
-    # Groq / Gemini 对大陆出口 IP 返回 403，本地拿不到 key，故不作默认。
-    # 如需换回，设 LLM_BASE_URL=https://api.groq.com/openai/v1
-    # 与 LLM_MODEL=openai/gpt-oss-120b 即可（Actions runner 在美国，更快）。
-    # workflow 里 ${{ vars.X }} 未配置时会展开成空字符串（变量存在但值为空），
-    # os.environ.get 的默认值在这种情况下不生效，必须用 or 显式兜底。
-    base = ((os.environ.get("LLM_BASE_URL") or "").strip().rstrip("/")
-            or "https://open.bigmodel.cn/api/paas/v4")
-    model = (os.environ.get("LLM_MODEL") or "").strip() or "glm-4-flash"
-    prompt = (
-        "你是中职职教高考与就业趋势分析助手。下面是本周采集到的原始标题清单。"
-        "请严格按照下面的规则输出中文解读，宁缺勿滥：\n"
-        "①【本周时间节点】只列出标题中能明确看出日期、考试、报名、录取、政策发布的条目，"
-        "最多 5 条、可以少于 3 条甚至写「本周无明确节点」；"
-        "每条标注适用人群（如 2028 年 6 月毕业的中职生 / 28 届）。"
-        "标题里没有写的日期绝对不要推测，就写「标题未注明日期」。\n"
-        "②【行业趋势】只有当标题正文里**明确出现**以下词之一时才做解读："
-        "人工智能、AI、大模型、算力、智能制造、机器人、计算机网络、通信、5G、6G、"
-        "就业、招聘、岗位、职业技能、职业教育、产教融合、技能人才。"
-        "对每条符合的标题，引用原标题关键词再说明趋势。"
-        "如果没有任何标题命中这些词，必须直接输出「本期无相关信号」，"
-        "**严禁把农业、气象、能源、体育、娱乐、时政等无关标题引申为 AI 或网络或就业趋势**。\n"
-        "③【本周待办】只能基于①里已列出的真实节点给 1 条可执行动作；"
-        "若①为空，则输出「本周无新增节点，按既有复习计划推进」。\n"
-        "其余要求：不要编造任何日期、文件名、通知名称；"
-        "不要输出表格或代码块；总长度控制在 600 字以内。\n\n"
-        + text[:6000]
-    )
-    body = json.dumps({"model": model,
-                       "messages": [{"role": "user", "content": prompt}],
-                       "temperature": 0.3, "max_tokens": 1600}).encode("utf-8")
-    last = ""
-    for attempt in range(2):
-        req = urllib.request.Request(base + "/chat/completions", data=body, headers={
-            "Authorization": "Bearer " + key, "Content-Type": "application/json",
-            "User-Agent": UA})
-        try:
-            with urllib.request.urlopen(req, timeout=90) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-            return data["choices"][0]["message"]["content"].strip(), None
-        except urllib.error.HTTPError as e:
-            detail = e.read().decode("utf-8", "replace")[:200]
-            last = "HTTP %s %s" % (e.code, detail)
-            if e.code not in (429, 500, 502, 503, 504):
-                break
-        except Exception as e:
-            last = "%s: %s" % (type(e).__name__, str(e)[:150])
-        if attempt == 0:
-            time.sleep(3)
-    return None, last
-
-
 def render_html(ctx):
     p = []
     p.append('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">')
@@ -387,10 +302,9 @@ def render_html(ctx):
 
     ok = sum(1 for s in ctx["sites"] if not s["error"])
     p.append('<div class="status"><strong>本期采集状态</strong>：政务/招生站点 %d/%d 可用；'
-             '新闻联播 %d/%d 天取到；AI 解读：%s。失败源只标注、不影响其余内容。</div>'
+             '新闻联播 %d/%d 天取到。失败源只标注、不影响其余内容。</div>'
              % (ok, len(ctx["sites"]),
-                sum(1 for d in ctx["xwlb"] if d["items"]), len(ctx["xwlb"]),
-                esc(ctx["ai_status"])))
+                sum(1 for d in ctx["xwlb"] if d["items"]), len(ctx["xwlb"])))
 
     p.append('<h2>本周时间节点提醒</h2>')
     if ctx["nodes"]:
@@ -452,31 +366,21 @@ def render_html(ctx):
     else:
         p.append('<div class="empty">暂无近 7 天采集数据（需先运行 Hotspot collect workflow）。</div>')
 
-    p.append('<h2>五、AI 解读</h2>')
-    if ctx["ai_text"]:
-        p.append('<div class="ai">%s</div>' % md_lite(ctx["ai_text"]))
-    else:
-        p.append('<div class="empty">%s。<br>启用方式：仓库 Settings → Secrets and variables '
-                 '→ Actions → New repository secret，添加 <code>LLM_API_KEY</code>'
-                 '（默认用智谱 open.bigmodel.cn 的免费 glm-4-flash，国内可直连）；'
-                 '若要换 Groq / OpenRouter，再在 Variables 里设 LLM_BASE_URL / LLM_MODEL。'
-                 '配置后本会自动追加趋势解读与 28 届待办，无需改代码。</div>'
-                 % esc(ctx["ai_status"]))
-
     p.append('<footer>适用对象标签按「职教高考年份 = 中职毕业年份」自动推断，'
              '凡推断结果均标注「预计」，请以官方原文为准。数据源见各节链接。'
              '由 GitHub Actions 于 %s 生成。</footer>' % esc(ctx["generated"]))
+    p.append('</div>')
     p.append(archive.widget("digest", ctx["date"]))
-    p.append('</div></body></html>')
+    p.append('</body></html>')
     return "\n".join(p)
 
 
 def render_md(ctx):
     p = ["# 热点信息差 · %s" % ctx["date"], "",
-         "> 周期 %s — %s ｜ 采集状态：站点 %d/%d 可用 ｜ AI 解读：%s"
+         "> 周期 %s — %s ｜ 采集状态：站点 %d/%d 可用"
          % (ctx["start"], ctx["date"],
             sum(1 for s in ctx["sites"] if not s["error"]),
-            len(ctx["sites"]), ctx["ai_status"]), "",
+            len(ctx["sites"])), "",
          "## 本周时间节点提醒", ""]
     if ctx["nodes"]:
         for n in ctx["nodes"]:
@@ -506,9 +410,7 @@ def render_md(ctx):
     p += ["", "## 四、社会热点", ""]
     p += ["- %s ｜ 上榜 %d 次 ｜ %d 平台" % (r["title"], r["count"], r["platforms"])
           for r in ctx["radar"]] or ["暂无近 7 天采集数据。"]
-    p += ["", "## 五、AI 解读", "",
-          ctx["ai_text"] or ("%s。配置 LLM_API_KEY 后自动生成。" % ctx["ai_status"]), "",
-          "---", "", "往期归档：archive.html", "",
+    p += ["", "---", "", "往期归档：archive.html", "",
           "适用对象为按年份自动推断，标注「预计」者请以官方原文为准。", ""]
     return "\n".join(p)
 
@@ -556,18 +458,6 @@ def main():
                 seen.add(it["title"])
                 nodes.append(it)
     ctx["nodes"] = nodes[:12]
-
-    print("[5/5] AI 解读 ...")
-    payload = []
-    for s in ctx["sites"]:
-        payload.append("[%s] %s" % (s["name"], "；".join(i["title"] for i in s["items"])))
-    for d in ctx["xwlb"]:
-        payload.append("[新闻联播 %s] %s" % (d["date"], "；".join(d["items"])))
-    payload.append("[GitHub] " + "；".join(g["title"] for g in ctx["github"]))
-    ctx["ai_text"], ai_err = ai_digest("\n".join(payload))
-    model_label = (os.environ.get("LLM_MODEL") or "").strip() or "glm-4-flash"
-    ctx["ai_status"] = ("已启用（%s）" % model_label) if ctx["ai_text"] else (ai_err or "未启用")
-    print("      %s" % ctx["ai_status"])
 
     if args.dry:
         print("\n--dry：未写文件。")

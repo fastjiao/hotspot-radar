@@ -30,19 +30,20 @@ BJ = timezone(timedelta(hours=8))
 WEEK = "一二三四五六日"
 
 CSS = """
-.wb-arch{max-width:900px;margin:48px auto 0;padding:18px 0 0;
-border-top:1px solid #d8d3c8;
+.wb-sidebar{margin:0;padding:14px 0 0;border-top:1px solid #d8d3c8;
 font:13px/1.6 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-@media(max-width:940px){.wb-arch{margin-left:20px;margin-right:20px}}
-.wb-arch-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:12px}
-.wb-arch h2{margin:0;padding:0;border:0;font-size:16px;font-weight:500;color:inherit;
+.wb-sidebar .wb-arch{max-width:none}
+.wb-arch{font:13px/1.6 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.wb-arch-head{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;margin-bottom:12px}
+.wb-arch h2{margin:0;padding:0;border:0;font-size:16px;font-weight:600;color:inherit;
 letter-spacing:0;font-family:inherit}
 .wb-arch a.wb-arch-all{font-size:12px;color:#6366F1;text-decoration:none;white-space:nowrap}
 .wb-arch a.wb-arch-all:hover{text-decoration:underline}
-.wb-arch-list{display:flex;flex-wrap:wrap;gap:8px}
-.wb-arch-list a{display:inline-block;padding:5px 11px;border:1px solid #d8d3c8;border-radius:999px;
-background:#fff;color:#4a4d58;text-decoration:none;font-size:12px;white-space:nowrap}
-.wb-arch-list a:hover{border-color:#6366F1;color:#6366F1;text-decoration:none}
+.wb-arch-list{display:flex;flex-direction:column;gap:4px}
+.wb-arch-list a{display:block;padding:6px 11px;border:1px solid #e3ded2;border-radius:8px;
+background:rgba(255,255,255,.6);color:#4a4d58;text-decoration:none;font-size:12.5px;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-arch-list a:hover{border-color:#6366F1;color:#6366F1;text-decoration:none;background:#fff}
 .wb-arch-list a.is-current{background:#6366F1;border-color:#6366F1;color:#fff}
 .wb-arch-empty{color:#6b675f;font-size:12px}
 @media(max-width:600px){.wb-arch h2{font-size:14px}}
@@ -51,12 +52,14 @@ background:#fff;color:#4a4d58;text-decoration:none;font-size:12px;white-space:no
 PAGE_CSS = """
 *{box-sizing:border-box}body{margin:0;background:#faf8f3;color:#1b1a17;
 font:15px/1.75 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-.wb-arch-page{max-width:900px;margin:0 auto;padding:40px 22px 80px}
+.wb-arch-page{max-width:none;margin:0;padding:36px clamp(20px,5vw,72px) 80px}
 h1{font-size:28px;margin:0 0 6px;letter-spacing:1px}
 .lead{color:#6b675f;font-size:13px;margin:0 0 36px}
 .wb-arch-page section{margin-bottom:36px}
 .wb-arch-page h2{font-size:19px;border-bottom:1px solid #d8d3c8;padding-bottom:8px;margin:0 0 16px}
 .wb-arch-page .wb-arch{margin:0;border:0;padding:0}
+.wb-arch-page .wb-arch-list{display:flex;flex-wrap:wrap;flex-direction:row;gap:8px}
+.wb-arch-page .wb-arch-list a{display:inline-block;padding:5px 12px;border-radius:999px;width:auto}
 @media(max-width:600px){.wb-arch-page{padding:26px 15px 60px}h1{font-size:23px}}
 """
 
@@ -155,12 +158,12 @@ def widget(kind, current=None):
     items = read_index().get(kind, [])
     shown = items[:12]
     html = [
-        '<section class="wb-arch" data-wb-arch="%s">' % kind,
+        '<aside class="wb-sidebar"><section class="wb-arch" data-wb-arch="%s">' % kind,
         '<div class="wb-arch-head"><h2>%s</h2>'
         '<a class="wb-arch-all" href="archive.html">全部归档 →</a></div>' % title,
         '<div class="wb-arch-list" data-wb-arch-list>%s</div>'
         % _links_html(shown, current),
-        '</section>',
+        '</section></aside>',
     ]
     js = """<script data-wb-arch>
 (function(){

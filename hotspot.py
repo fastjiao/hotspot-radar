@@ -125,8 +125,13 @@ STYLE = """
 *{box-sizing:border-box}
 body{margin:0;padding:0 20px 64px;background:var(--paper);color:var(--ink);
  font:14px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
- -webkit-font-smoothing:antialiased}
-.wrap{max-width:1060px;margin:0 auto}
+ -webkit-font-smoothing:antialiased;
+ display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:36px;
+ align-items:start}
+body > .wb-nav{grid-column:1 / -1;width:auto;margin-left:0}
+body > .wrap{grid-column:2}
+body > .wb-sidebar{grid-column:1;grid-row:2;position:sticky;top:76px}
+.wrap{max-width:none;margin:0 auto;width:100%}
 .serif{font-family:Georgia,"Songti SC","STSong","Noto Serif SC","SimSun",serif}
 .masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
  flex-wrap:wrap;margin-top:36px;padding:20px 0 16px;
@@ -177,8 +182,8 @@ th{padding:10px;text-align:left;white-space:nowrap;font-weight:400;font-size:10p
 td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 tbody tr:hover td{background:var(--hover)}
 .rank-section{position:relative}
-.rank-section h2{position:sticky;top:0;z-index:6;background:var(--paper)}
-.rank-section thead th{position:sticky;top:var(--head-h,42px);z-index:5;background:var(--paper)}
+.rank-section h2{position:sticky;top:var(--nav-h,52px);z-index:6;background:var(--paper)}
+.rank-section thead th{position:sticky;top:calc(var(--nav-h,52px) + var(--head-h,42px));z-index:5;background:var(--paper)}
 th.sortable{cursor:pointer;user-select:none}
 th.sortable:hover{color:var(--accent)}
 th.sortable:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
@@ -206,6 +211,12 @@ td.num{text-align:right;white-space:nowrap;color:var(--muted);font-family:Georgi
 .masthead,.stats,.focus{animation:rise .55s ease both}
 .stats{animation-delay:.09s}.focus{animation-delay:.17s}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:900px){
+ body{display:block;padding:0 20px 64px}
+ body > .wrap{width:100%}
+ body > .wb-sidebar{position:static;margin-top:48px}
+ .wrap{max-width:900px;margin:0 auto}
+}
 @media(max-width:760px){
  body{padding:0 14px 44px}
  .masthead h1{font-size:30px}
