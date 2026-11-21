@@ -4,12 +4,14 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#faf8f3;color:#1b1a17;
 font:15px/1.75 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-.wb-arch-page{max-width:900px;margin:0 auto;padding:40px 22px 80px}
+.wb-arch-page{max-width:none;margin:0;padding:36px clamp(20px,5vw,72px) 80px}
 h1{font-size:28px;margin:0 0 6px;letter-spacing:1px}
 .lead{color:#6b675f;font-size:13px;margin:0 0 36px}
 .wb-arch-page section{margin-bottom:36px}
 .wb-arch-page h2{font-size:19px;border-bottom:1px solid #d8d3c8;padding-bottom:8px;margin:0 0 16px}
 .wb-arch-page .wb-arch{margin:0;border:0;padding:0}
+.wb-arch-page .wb-arch-list{display:flex;flex-wrap:wrap;flex-direction:row;gap:8px}
+.wb-arch-page .wb-arch-list a{display:inline-block;padding:5px 12px;border-radius:999px;width:auto}
 @media(max-width:600px){.wb-arch-page{padding:26px 15px 60px}h1{font-size:23px}}
 </style><style data-wb-nav>
 .wb-nav{position:sticky;top:0;z-index:100;width:100vw;margin-left:calc(50% - 50vw);
@@ -39,19 +41,20 @@ body > .wrap{animation:wb-enter .3s ease-out both}
 @media(max-width:600px){.wb-nav-inner{padding:.5rem .7rem;flex-wrap:wrap}
 .wb-nav a.wb-nav-link{padding:5px 10px;font-size:.8rem}}
 </style><style data-wb-arch>
-.wb-arch{max-width:900px;margin:48px auto 0;padding:18px 0 0;
-border-top:1px solid #d8d3c8;
+.wb-sidebar{margin:0;padding:14px 0 0;border-top:1px solid #d8d3c8;
 font:13px/1.6 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-@media(max-width:940px){.wb-arch{margin-left:20px;margin-right:20px}}
-.wb-arch-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:12px}
-.wb-arch h2{margin:0;padding:0;border:0;font-size:16px;font-weight:500;color:inherit;
+.wb-sidebar .wb-arch{max-width:none}
+.wb-arch{font:13px/1.6 "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.wb-arch-head{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;margin-bottom:12px}
+.wb-arch h2{margin:0;padding:0;border:0;font-size:16px;font-weight:600;color:inherit;
 letter-spacing:0;font-family:inherit}
 .wb-arch a.wb-arch-all{font-size:12px;color:#6366F1;text-decoration:none;white-space:nowrap}
 .wb-arch a.wb-arch-all:hover{text-decoration:underline}
-.wb-arch-list{display:flex;flex-wrap:wrap;gap:8px}
-.wb-arch-list a{display:inline-block;padding:5px 11px;border:1px solid #d8d3c8;border-radius:999px;
-background:#fff;color:#4a4d58;text-decoration:none;font-size:12px;white-space:nowrap}
-.wb-arch-list a:hover{border-color:#6366F1;color:#6366F1;text-decoration:none}
+.wb-arch-list{display:flex;flex-direction:column;gap:4px}
+.wb-arch-list a{display:block;padding:6px 11px;border:1px solid #e3ded2;border-radius:8px;
+background:rgba(255,255,255,.6);color:#4a4d58;text-decoration:none;font-size:12.5px;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-arch-list a:hover{border-color:#6366F1;color:#6366F1;text-decoration:none;background:#fff}
 .wb-arch-list a.is-current{background:#6366F1;border-color:#6366F1;color:#fff}
 .wb-arch-empty{color:#6b675f;font-size:12px}
 @media(max-width:600px){.wb-arch h2{font-size:14px}}
@@ -59,7 +62,7 @@ background:#fff;color:#4a4d58;text-decoration:none;font-size:12px;white-space:no
 <nav class="wb-nav" aria-label="站点导航"><div class="wb-nav-inner"><a class="wb-nav-brand" href="/">Lovejiao</a><div class="wb-nav-links"><a class="wb-nav-link" href="/">首页</a><a class="wb-nav-link" href="/hotspot-radar/">社会热点日报</a><a class="wb-nav-link" href="/hotspot-radar/digest.html">热点信息差</a><a class="wb-nav-link is-active" href="/hotspot-radar/archive.html" aria-current="page">往期归档</a></div></div></nav>
 <div class="wb-arch-page">
 <h1>往期归档</h1>
-<p class="lead">社会热点日报与热点信息差的完整历史 · 共 10 期日报 / 3 期信息差 · 索引更新于 2026-11-21 04:49</p>
+<p class="lead">社会热点日报与热点信息差的完整历史 · 共 10 期日报 / 3 期信息差 · 索引更新于 2026-11-21 19:51</p>
 <section><h2>社会热点日报</h2>
 <div class="wb-arch"><div class="wb-arch-list"><a href="day-20261121.html">日报 · 2026-11-21 周六</a><a href="day-20261120.html">日报 · 2026-11-20 周五</a><a href="day-20261119.html">日报 · 2026-11-19 周四</a><a href="day-20261118.html">日报 · 2026-11-18 周三</a><a href="day-20261117.html">日报 · 2026-11-17 周二</a><a href="day-20261116.html">日报 · 2026-11-16 周一</a><a href="day-20261115.html">日报 · 2026-11-15 周日</a><a href="day-20261113.html">日报 · 2026-11-13 周五</a><a href="week-20261113.html">周报 · 2026-11-13 周五</a><a href="week-20261108.html">周报 · 2026-11-08 周日</a></div></div>
 </section>
